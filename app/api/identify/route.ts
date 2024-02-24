@@ -13,30 +13,6 @@ const uuid  = require("uuid");;
 
 
 
-  interface Input {
-    image_url: string // you have access to it
-    language?: string // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
-    location?: string // optional field, if available it adds more context about where the user is taking this picture, if it helps in providing response
-    age?: number // optional field: If age available it adds adjust the tone and information provided based on that age group
- }
-
- interface Output {
-        art_title: string, // the title of the art work
-        artist_name: string, // the name of the artist
-        date: string, // date the art is created
-        more_about_artist: string, // a brief about artist, to show as complimentary data
-        brief_history: string, // a brief history, importance and why it's famous, what's important about it
-        technical_details: string, // from art point of view, what are some details? What details the audience should pay attention to, and why?
-       other_facts: string, // any fun cats, social or historical facts about it
-       recommended: {
-         art_title: string
-         artist_name: string,
-         dat: string,
-         image_url: string //an external image url on internet
-        link: string // an external url to learn more about it
-        }[]
- }
-
   async function getInformationFromGemini(input: Input) {
 
     const parts = [
@@ -85,10 +61,11 @@ const uuid  = require("uuid");;
  const searchParams = req.nextUrl.searchParams;
  const inputObject = Object.fromEntries(searchParams.entries());
     const output = await getInformationFromGemini(inputObject);
+    console.log({output})
     // get user id from cookies, if not avaiable, set one under the key user_id, value is a uuid, use uuidv4 for generating.
     const user_id = req.cookies.get('user_id') || uuid.v4();
     // set the user_id cookie
-    const response = new NextResponse(JSON.stringify(output),{status:200});
+    const response = new NextResponse(output,{status:200,headers:{"Content-Type":"application/json"}});
     response.cookies.set('user_id', user_id);
     return response;
   }

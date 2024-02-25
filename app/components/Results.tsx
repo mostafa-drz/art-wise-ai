@@ -1,8 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-interface Props extends Output{
-}
+interface Props extends Output {}
 
 const Results: React.FC<Props> = ({
   art_title,
@@ -13,7 +12,7 @@ const Results: React.FC<Props> = ({
   technical_details,
   other_facts,
   recommended,
-  originalImageURL
+  imageBase64,
 }) => {
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -22,7 +21,7 @@ const Results: React.FC<Props> = ({
       </div>
       <div className="w-full h-64 sm:h-96 relative overflow-hidden">
         <img
-          src={originalImageURL}
+          src={`data:image/jpeg;base64, ${imageBase64}`}
           alt="Original Artwork"
           loading="lazy"
           className="object-cover w-full h-full"
@@ -44,7 +43,9 @@ const Results: React.FC<Props> = ({
           </div>
           <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">More About Artist</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{more_about_artist}</dd>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              {more_about_artist}
+            </dd>
           </div>
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Brief History</dt>
@@ -52,7 +53,9 @@ const Results: React.FC<Props> = ({
           </div>
           <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Technical Details</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{technical_details}</dd>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              {technical_details}
+            </dd>
           </div>
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Other Facts</dt>
@@ -63,11 +66,15 @@ const Results: React.FC<Props> = ({
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {recommended.map((item, index) => (
                 <div key={index} className="bg-gray-50 rounded-lg p-4">
-                  <img src={item.image_url} alt={item.art_title} className="rounded-md"/>
+                  <img src={item.image_url} alt={item.art_title} className="rounded-md" />
                   <div className="mt-2">
                     <h5 className="text-sm font-medium text-gray-900">{item.art_title}</h5>
-                    <p className="text-sm text-gray-500">By {item.artist_name}, {item.date}</p>
-                    <a href={item.link} className="text-indigo-600 hover:text-indigo-900 text-sm">Learn more</a>
+                    <p className="text-sm text-gray-500">
+                      By {item.artist_name}, {item.date}
+                    </p>
+                    <a href={item.link} className="text-indigo-600 hover:text-indigo-900 text-sm">
+                      Learn more
+                    </a>
                   </div>
                 </div>
               ))}

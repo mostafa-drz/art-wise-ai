@@ -6,6 +6,14 @@ interface Input {
     user_id: string // user_id
  }
 
+ interface RecommendedArt {
+    art_title: string;
+    artist_name: string;
+    date: string;
+    image_url: string;
+    link: string;
+  }
+
  interface Output {
         art_title: string, // the title of the art work
         artist_name: string, // the name of the artist
@@ -14,11 +22,6 @@ interface Input {
         brief_history: string, // a brief history, importance and why it's famous, what's important about it
         technical_details: string, // from art point of view, what are some details? What details the audience should pay attention to, and why?
        other_facts: string, // any fun cats, social or historical facts about it
-       recommended: {
-         art_title: string
-         artist_name: string,
-         dat: string,
-         image_url: string //an external image url on internet
-        link: string // an external url to learn more about it
-        }[]
+       originalImageURL: string, // the original image URL
+       recommended: RecommendedArt[]
  }

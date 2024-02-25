@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
     mimeType: image.type,
   };
 
-  const outputResponse = await getInformationFromGemini(undefined, {inlineData});
+  const outputResponse = await getInformationFromGemini({...otherFields}, {inlineData});
+  console.log({outputResponse})
   const outputObject = JSON.parse(outputResponse);
   // get user id from cookies, if not avaiable, set one under the key user_id, value is a uuid, use uuidv4 for generating.
   const userIdFromCookies = getUserIDFromRequest(req);

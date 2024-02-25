@@ -9,6 +9,12 @@ interface FormProps {
 }
 
 const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) => {
+  const [defaultLanguage, setDefaultLanguage] = React.useState<string>('en_US');
+
+  React.useEffect(() => {
+    setDefaultLanguage(navigator.language);
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <form
@@ -48,6 +54,26 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
             className="mt-1 flex-grow border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
+
+        {/* Language*/}
+        <div className="flex items-center space-x-3">
+          <label htmlFor="language" className="block text-sm font-medium text-gray-700 shrink-0">
+            Language:
+          </label>
+          <select
+            name="language"
+            id="language"
+            defaultValue={defaultLanguage}
+            className="flex-1 border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="en-US">English (United States)</option>
+            <option value="en-CA">English (Canada)</option>
+            <option value="fr-CA">French (Canada)</option>
+            <option value="fr-FR">French (France)</option>
+            {/* Add more language options as needed */}
+          </select>
+        </div>
+
 
         {/* Submit Button */}
         <div className="pt-4">

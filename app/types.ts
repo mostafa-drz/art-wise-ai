@@ -33,3 +33,7 @@ interface ImagePart {
   };
 }
 
+interface RequestFormData extends Input {
+  image?: File;
+}
+

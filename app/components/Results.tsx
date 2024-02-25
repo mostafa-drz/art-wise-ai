@@ -66,7 +66,7 @@ const Results: React.FC<Props> = ({
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {recommended.map((item, index) => (
                 <div key={index} className="bg-gray-50 rounded-lg p-4">
-                  <img src={item.image_url} alt={item.art_title} className="rounded-md" />
+                  {/* <img src={item.image_url} alt={item.art_title} className="rounded-md" /> */}
                   <div className="mt-2">
                     <h5 className="text-sm font-medium text-gray-900">{item.art_title}</h5>
                     <p className="text-sm text-gray-500">

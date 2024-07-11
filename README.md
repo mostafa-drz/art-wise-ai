@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Art-Wise AI
+
+Art-Wise AI is an intelligent assistant designed to educate users about various artworks. By leveraging Google Generative AI, the app provides detailed information about artwork based on user-provided image URLs. This project is built with Next.js, Firebase, and various modern development tools.
+
+## Features
+- **Artwork Information**: Get comprehensive details about any artwork, including title, artist, date, history, technical details, and fun facts.
+- **Recommendations**: Discover other artworks by the same artist with images and links.
+- **Personalization**: Responses are tailored based on user information like language, location, and age.
+
+## Technology Stack
+- **Next.js**: For server-side rendering and building the web application.
+- **Firebase**: For backend services and database management.
+- **Google Generative AI**: To generate detailed artwork descriptions.
+- **Tailwind CSS**: For styling the UI.
+- **TypeScript**: For type safety and modern JavaScript development.
+- **ESLint and Prettier**: For maintaining code quality and formatting.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js and npm installed on your local machine.
+- Firebase account and project setup.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Installation
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/mostafa-drz/art-wise-ai.git
+   cd art-wise-ai
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Set up Firebase**:
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
+   - Add a web app to your Firebase project and get the configuration.
+   - Set up Firebase Admin SDK and generate a service account key.
+   - Copy the Firebase configuration and service account key to your project.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. **Configure environment variables**:
+   Create a `.env.local` file in the root of the project and add the following variables:
+   ```bash
+   GEMINI_API_KEY={{YOUR GEMINI API KEY}}
+   GOOGLE_APPLICATION_CREDENTIALS=./firebase-admin-service-account.json
+   ```
 
-## Learn More
+### Running the Application
+1. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
+- **Upload an artwork image**: Provide an image URL of the artwork you want to learn about.
+- **Receive detailed information**: The app will use Google Generative AI to generate and display detailed information about the artwork.
+- **Explore recommendations**: Discover other artworks by the same artist.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Contributing
+Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure that your code follows the established code style and passes all linting checks.
 
-## Deploy on Vercel
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contact
+For any inquiries or feedback, please contact [Mostafa DRZ](https://github.com/mostafa-drz).

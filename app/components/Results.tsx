@@ -24,7 +24,7 @@ const Results: React.FC<Props> = ({
           src={`data:image/jpeg;base64, ${imageBase64}`}
           alt="Original Artwork"
           loading="lazy"
-          className="object-cover w-full h-full"
+          className="object-contain w-full h-full"
         />
       </div>
       <div className="border-t border-gray-200">

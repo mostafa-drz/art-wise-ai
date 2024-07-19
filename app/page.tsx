@@ -54,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-4xl">Art Wise AI</h1>
+          <h1 className="text-4xl">Art Wise AI</h1>
       <InputForm onSubmit={handleSubmit} isLoading={loading} />
       <br />
       <Suspense fallback={<p>Loading...</p>}>

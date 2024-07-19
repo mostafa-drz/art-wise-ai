@@ -24,52 +24,54 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
         encType="multipart/form-data"
         onSubmit={onSubmit}
       >
-        <div className="text-lg font-medium text-gray-900 mb-4">
-          Upload an image or paste an image URL to start
-        </div>
+        <fieldset disabled={isLoading}>
+          <div className="text-lg font-medium text-gray-900 mb-4">
+            Upload an image or paste an image URL to start
+          </div>
 
-        {/* Image File Upload */}
-        <div className="flex items-center space-x-3">
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700 shrink-0">
-            Upload Image:
-          </label>
-          <input
-            type="file"
-            name="image"
-            id="image"
-            className="mt-1 flex-grow border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
+          {/* Image File Upload */}
+          <div className="flex items-center space-x-3">
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 shrink-0">
+              Upload Image:
+            </label>
+            <input
+              type="file"
+              name="image"
+              id="image"
+              className="mt-1 flex-grow border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
 
-        {/* Language*/}
-        <div className="flex items-center space-x-3">
-          <label htmlFor="language" className="block text-sm font-medium text-gray-700 shrink-0">
-            Language:
-          </label>
-          <select
-            name="language"
-            id="language"
-            defaultValue={defaultLanguage}
-            className="flex-1 border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="en-US">English (United States)</option>
-            <option value="en-CA">English (Canada)</option>
-            <option value="fr-CA">French (Canada)</option>
-            <option value="fr-FR">French (France)</option>
-            {/* Add more language options as needed */}
-          </select>
-        </div>
+          {/* Language*/}
+          <div className="flex items-center space-x-3">
+            <label htmlFor="language" className="block text-sm font-medium text-gray-700 shrink-0">
+              Language:
+            </label>
+            <select
+              name="language"
+              id="language"
+              defaultValue={defaultLanguage}
+              className="flex-1 border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="en-US">English (United States)</option>
+              <option value="en-CA">English (Canada)</option>
+              <option value="fr-CA">French (Canada)</option>
+              <option value="fr-FR">French (France)</option>
+              {/* Add more language options as needed */}
+            </select>
+          </div>
 
-        {/* Submit Button */}
-        <div className="pt-4">
-          <button
-            type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            disabled={isLoading}
-          >
-            Submit
-          </button>
-        </div>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              className="disabled:opacity-50 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={isLoading}
+            >
+              Submit
+            </button>
+          </div>
+        </fieldset>
       </form>
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
     </div>

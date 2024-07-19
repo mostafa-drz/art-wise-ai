@@ -1,7 +1,7 @@
 'use client';
 
 import InputForm from './components/InputForm';
-import { Suspense, useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Results from './components/Results';
 import imageCompression, { Options } from 'browser-image-compression';
 
@@ -69,15 +69,19 @@ export default function Home() {
       setLoading(false);
     }
   }
-  
+
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-4xl">Art Wise AI</h1>
       <InputForm onSubmit={handleSubmit} isLoading={loading} />
       <br />
-      <Suspense fallback={<p>Loading...</p>}>
-        {data && <Results {...data} imageBase64={imageBase64} />}
-      </Suspense>
+      {loading ? (
+        <div className="animate-pulse text-3xl">
+          Loading...
+        </div>
+      ) : (
+        data && <Results {...data} imageBase64={imageBase64} />
+      )}
     </div>
   );
 }

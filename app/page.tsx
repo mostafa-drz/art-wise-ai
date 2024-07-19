@@ -72,11 +72,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-4xl">Art Wise AI</h1>
+      <h1 className="text-4xl font-bold text-gray-800">Art Wise AI</h1>
       <InputForm onSubmit={handleSubmit} isLoading={loading} />
       <br />
       {loading ? (
-        <div className="animate-pulse text-3xl">
+        <div className="animate-pulse text-3xl text-gray-600">
           Loading...
         </div>
       ) : (

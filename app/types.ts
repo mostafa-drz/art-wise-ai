@@ -1,8 +1,5 @@
 interface Input {
-  image_url?: string; // you have access to it
   language?: string; // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
-  location?: string; // optional field, if available it adds more context about where the user is taking this picture, if it helps in providing response
-  age?: number; // optional field: If age available it adds adjust the tone and information provided based on that age group
 }
 
 interface RecommendedArt {
@@ -36,4 +33,3 @@ interface ImagePart {
 interface RequestFormData extends Input {
   image?: File;
 }
-

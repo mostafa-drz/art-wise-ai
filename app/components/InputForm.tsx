@@ -41,20 +41,6 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
           />
         </div>
 
-        {/* Image URL Input */}
-        <div className="flex items-center space-x-3">
-          <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 shrink-0">
-            Or, paste image URL:
-          </label>
-          <input
-            type="text"
-            name="image_url"
-            id="image_url"
-            placeholder="https://example.com/image.jpg"
-            className="mt-1 flex-grow border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
         {/* Language*/}
         <div className="flex items-center space-x-3">
           <label htmlFor="language" className="block text-sm font-medium text-gray-700 shrink-0">
@@ -73,7 +59,6 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
             {/* Add more language options as needed */}
           </select>
         </div>
-
 
         {/* Submit Button */}
         <div className="pt-4">

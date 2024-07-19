@@ -25,9 +25,7 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
         onSubmit={onSubmit}
       >
         <fieldset disabled={isLoading}>
-          <div className="text-2xl font-semibold text-gray-800 mb-6">
-            Upload an image or paste an image URL to start
-          </div>
+          <div className="text-2xl font-semibold text-gray-800 mb-6">Upload an image</div>
 
           {/* Image File Upload */}
           <div className="flex items-center space-x-3">

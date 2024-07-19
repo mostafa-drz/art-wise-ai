@@ -1,64 +1,29 @@
-
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-  
-  const API_KEY = process.env.GEMINI_API_KEY || '';
-  
-  const genAI = new GoogleGenerativeAI(API_KEY);
+const API_KEY = process.env.GEMINI_API_KEY || '';
 
-  export async function getInformationFromGemini(input: Input | undefined, imagePart?:ImagePart) {
-    if(!input){
-      throw Error('No input provided');
-    }
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-    const parts = [];
-    const textPart = {
-      text: createPrompt(input)
-    }
-    parts.push(textPart);
-  
-    if (imagePart) {
-      parts.push(imagePart);
-    }
-  
-    const generationConfig = {
-      temperature: 0.2,
-      topK: 1,
-      topP: 0.1,
-      maxOutputTokens: 2048,
-    };
-  
-    const safetySettings = [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-      },
-    ];
-  
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts }],
-      generationConfig,
-      safetySettings,
-    });
-    const response = result.response;
-    const responseObject = response;
-    return responseObject.text();
+const genAI = new GoogleGenerativeAI(API_KEY);
+
+export async function getInformationFromGemini(input: Input | undefined, imagePart: ImagePart) {
+  if (!input) {
+    throw Error('No input provided');
   }
+  if (!imagePart) {
+    throw Error('No image provided');
+  }
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-pro',
+    generationConfig: { responseMimeType: 'application/json' },
+  });
 
-  const createPrompt = (input: Input): string => {
-    const prompt = `
+  const prompt = createPrompt(input);
+  const result = await model.generateContent([imagePart, prompt]);
+  const response = result.response;
+  return response.text();
+}
+
+const createPrompt = (input: Input): string => {
+  const prompt = `
      As a user, I provide you an image from an art work which I captured on museum, or in an art gallery, or from internet, or a screenshot. You receive the URL.
      Your job is, as a smart assistant, educate user about that art work. You have a professional, simple, funny, friendly passion tone.
      You provide informations, in 3 areas:
@@ -92,9 +57,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
      You should use these information to tailor your response.
      The output data, including all fields, should be translated to whatever you receive under 'input.language', if nothing provided default is 'en-US'. These are ISO language codes.
      For the multi-language support make sure the JSON response you send back should follow the definition under Output and it should count for special characters.
-     The output format must be a pure JSON object, with the following definition in typescript which you use to respond to the prompts in this format only.
-     You need to make sure it is a VALID JSON object and it supports special characters from other languages like French in response.
-     No extra chars should be added to the response. 
+      The output should be parsable by JSON.parse(output) method
      
      interface Output {
         art_title: string, // the title of the art work
@@ -114,25 +77,45 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
         }[]
      }
 
-     ### Accepted Output:
-     {
-        "artist_name": "Vincent van Gogh",
-        "art_title": "The Starry Night",
-        "date": "1889",
-        ....
-     }
+     ### Example output response:
+     "{
+  "art_title": "Starry Night",
+  "artist_name": "Vincent van Gogh",
+  "date": "1889",
+  "more_about_artist": "Vincent van Gogh was a Dutch post-impressionist painter known for his vivid colors and emotional depth. Despite his fame, he struggled with mental illness and poverty throughout his life.",
+  "brief_history": "Starry Night is one of Vincent van Gogh's most famous paintings. Created during his time at the asylum in Saint-Rémy-de-Provence, it depicts the view from his window at night, although it was painted from memory during the day.",
+  "technical_details": "The painting features swirling patterns in the sky, a cypress tree in the foreground, and a tranquil village below. Van Gogh used bold, expressive brushstrokes and a rich palette of blues and yellows to create a sense of movement and depth.",
+  "other_facts": "Starry Night has inspired countless artists and is considered a masterpiece of post-impressionism. It is housed in the Museum of Modern Art in New York City. Despite its fame, van Gogh considered it a failure.",
+  "originalImageURL": "https://www.moma.org/media/W1siZiIsIjMyODcyMyJdLFsicCIsImNvbnZlcnQiLCItcmVzaXplIDEzNjZ4MTM2Nlx1MDAzZSJdXQ.jpg?sha=5a5b2b935b6cfb3b",
+  "recommended": [
+    {
+      "art_title": "The Persistence of Memory",
+      "artist_name": "Salvador Dalí",
+      "date": "1931",
+      "image_url": "https://www.moma.org/media/W1siZiIsIjMyODcyMyJdLFsicCIsImNvbnZlcnQiLCItcmVzaXplIDEzNjZ4MTM2Nlx1MDAzZSJdXQ.jpg?sha=5a5b2b935b6cfb3b",
+      "link": "https://www.moma.org/collection/works/79018"
+    },
+    {
+      "art_title": "Mona Lisa",
+      "artist_name": "Leonardo da Vinci",
+      "date": "1503",
+      "image_url": "https://www.louvre.fr/sites/default/files/medias/medias_images/images/louvre-mona-lisa.jpg",
+      "link": "https://www.louvre.fr/en/explore/the-palace/mona-lisa"
+    },
+    {
+      "art_title": "The Scream",
+      "artist_name": "Edvard Munch",
+      "date": "1893",
+      "image_url": "https://www.edvardmunch.org/images/paintings/the-scream.jpg",
+      "link": "https://www.edvardmunch.org/the-scream.jsp"
+    }
+  ],
+  "imageBase64": "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+}"
 
-     ### Rejected Output:
-     JSON{
-        "artist_name": "Vincent van Gogh",
-        "art_title": "The Starry Night",
-        "date": "1889",
-        ....
-        "random_field": "random_value"
-     }
      
      input: ${JSON.stringify(input)}
      `;
- 
-     return prompt;
-  }
+
+  return prompt;
+};

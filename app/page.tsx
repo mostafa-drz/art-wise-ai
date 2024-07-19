@@ -37,6 +37,7 @@ export default function Home() {
       if (!res.ok) throw new Error(await res.text());
       const responseData = await res.json();
       setData(responseData); // Set the response data to state
+      setLoading(false); // Stop loading
     };
   }, []);
   // Handle messages from the worker
@@ -68,7 +69,7 @@ export default function Home() {
       setLoading(false);
     }
   }
-
+  
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-4xl">Art Wise AI</h1>

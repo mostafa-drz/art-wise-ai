@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { GoogleGenerativeAI, Content } from '@google/generative-ai';
 
 const API_KEY = process.env.GEMINI_API_KEY || '';
 
@@ -118,4 +118,51 @@ const createPrompt = (input: Input): string => {
      `;
 
   return prompt;
+};
+
+const SYSTEM_CHAT_PROMPT: Content = {
+  role: 'system',
+  parts: [
+    {
+      text: `
+      As an AI art advisor, the user provides you with information about an artwork.
+      You respond to questions based on reliable resources, in a professional, simple, funny, friendly passionate tone.
+      You never provide any fake information, you always provide information based on reliable resources.
+      You receive the artwork information in JSON format.
+    `,
+    },
+  ],
+};
+
+export const chatWithGemini = async (
+  message: string,
+  history: Content[],
+  context: Output,
+): Promise<{ text: string; newHistory: Content[] }> => {
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-pro',
+  });
+
+  const historyToUse =
+    history.length > 0
+      ? history
+      : [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `
+    I have questions about this art work. Can you provide me more information about it?
+
+    ART_WORK_INFORMATION=${JSON.stringify(context)}
+    `,
+              },
+            ],
+          },
+        ];
+  const chat = model.startChat({ history: historyToUse, systemInstruction: SYSTEM_CHAT_PROMPT });
+  const result = await chat.sendMessage(message);
+  const text = result.response.text();
+  const newHistory = await chat.getHistory();
+  return { text, newHistory };
 };

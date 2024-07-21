@@ -1,8 +1,10 @@
 'use client';
 
-import InputForm from './components/InputForm';
 import { useState, useRef, useEffect } from 'react';
+import InputForm from './components/InputForm';
 import Results from './components/Results';
+import ChatContainer from './components/Chat';
+import { Content } from '@google/generative-ai';
 import imageCompression, { Options } from 'browser-image-compression';
 
 const imageCompressingOptions: Options = {
@@ -15,6 +17,8 @@ export default function Home() {
   const [data, setData] = useState<Output | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageBase64, setImageBase64] = useState<string>('');
+  const [messages, setMessages] = useState<Content[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
   const worker = useRef<Worker>();
   const formData = useRef(new FormData());
 
@@ -70,6 +74,27 @@ export default function Home() {
     }
   }
 
+  async function handleSendMessage(content: string) {
+    setChatLoading(true);
+
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: content, history: messages, context: data }),
+    });
+
+    if (!res.ok) {
+      setChatLoading(false);
+      throw new Error(await res.text());
+    }
+
+    const { newHistory } = await res.json();
+    setMessages(newHistory);
+    setChatLoading(false);
+  }
+
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-4xl font-bold text-gray-800 mb-4">Art Wise AI</h1>
@@ -85,6 +110,11 @@ export default function Home() {
       ) : (
         data && <Results {...data} imageBase64={imageBase64} />
       )}
+      <ChatContainer
+        messages={messages.slice(1)}
+        isLoading={chatLoading}
+        onSendMessage={handleSendMessage}
+      />
     </div>
   );
 }

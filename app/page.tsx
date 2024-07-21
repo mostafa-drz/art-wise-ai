@@ -110,11 +110,13 @@ export default function Home() {
       ) : (
         data && <Results {...data} imageBase64={imageBase64} />
       )}
-      <ChatContainer
-        messages={messages.slice(1)}
-        isLoading={chatLoading}
-        onSendMessage={handleSendMessage}
-      />
+      {data && (
+        <ChatContainer
+          messages={messages.slice(1)}
+          isLoading={chatLoading}
+          onSendMessage={handleSendMessage}
+        />
+      )}
     </div>
   );
 }

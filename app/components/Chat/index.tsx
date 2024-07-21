@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Content } from '@google/generative-ai';
 import Message from './Message';
 import NewMessage from './NewMessage';
+import ScrollToBottom from 'react-scroll-to-bottom';
 
 interface ChatContainerProps {
   messages: Content[];
@@ -24,7 +25,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, isLoading, onSe
               X
             </button>
           </div>
-          <div className="flex-grow overflow-y-auto p-4">
+          <ScrollToBottom className="flex-grow overflow-y-auto p-4">
             {messages.map((message, index) => (
               <Message key={index} message={message} />
             ))}
@@ -52,7 +53,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, isLoading, onSe
                 </svg>
               </div>
             )}
-          </div>
+          </ScrollToBottom>
           <NewMessage onSend={onSendMessage} isLoading={isLoading} />
         </div>
       ) : (

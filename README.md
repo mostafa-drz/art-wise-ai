@@ -50,7 +50,7 @@ Art-Wise AI is an intelligent assistant designed to educate users about various 
    Create a `.env.local` file in the root of the project and add the following variables:
    ```bash
    GEMINI_API_KEY={{YOUR GEMINI API KEY}}
-   GOOGLE_APPLICATION_CREDENTIALS=./firebase-admin-service-account.json
+   GEMINI_MODEL={{GEMINI_MODEL}}
    ```
 
 ### Running the Application

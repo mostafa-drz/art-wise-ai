@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI, Content } from '@google/generative-ai';
 
 const API_KEY = process.env.GEMINI_API_KEY || '';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -12,7 +13,7 @@ export async function getInformationFromGemini(input: Input | undefined, imagePa
     throw Error('No image provided');
   }
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
+    model: MODEL ,
     generationConfig: { responseMimeType: 'application/json' },
   });
 
@@ -26,7 +27,7 @@ const createPrompt = (input: Input): string => {
   const prompt = `
      As a user, I provide you an image from an art work which I captured on museum, or in an art gallery, or from internet, or a screenshot. You receive the URL.
      Your job is, as a smart assistant, educate user about that art work. You have a professional, simple, funny, friendly passion tone.
-     You provide informations, in 3 areas:
+     You provide information, in 3 areas:
      1) The art title, artist name, date, a brief history of this work and artist, and why it matters really.
      2) More about technicality of it, the details in the work, what's special about it.
      3) Historical, social, or any other fun fact.
@@ -44,13 +45,6 @@ const createPrompt = (input: Input): string => {
      Input format:
      The input format will be a JSON object with the following format(defined in typescript):
      
-     interface Input {
-        image_url: string // you have access to it
-        user_id: string // user_id
-        language?: string // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
-        location?: string // optional field, if available it adds more context about where the user is taking this picture, if it helps in providing response
-        age?: number // optional field: If age available it adds adjust the tone and information provided based on that age group
-     }
      
      Output: 
      The input object that you receive, is a JSON object, it provides more context about the user, things like age, location and language.
@@ -59,25 +53,17 @@ const createPrompt = (input: Input): string => {
      For the multi-language support make sure the JSON response you send back should follow the definition under Output and it should count for special characters.
       The output should be parsable by JSON.parse(output) method
      
-     interface Output {
-        art_title: string, // the title of the art work
-        artist_name: string, // the name of the artist
-        date: string, // date the art is created
-        more_about_artist: string, // a brief about artist, to show as complimentary data
-        brief_history: string, // a brief history, importance and why it's famous, what's important about it
-        technical_details: string, // from art point of view, what are some details? What details the audience should pay attention to, and why?
-        other_facts: string, // any fun facts, social or historical facts about it
-        originalImageURL: string // simply returns the original image url submitted by user
-        recommended: {
-           art_title: string
-           artist_name: string,
-           date: string,
-           image_url?: string // a thumbnail image, in formats jpg, png, jpeg
-           link: string // an external url to learn more about it
-        }[]
-     }
 
-     ### Example output response:
+     ## Example:
+      ###Input:
+      "{
+          "image_url": "https://www.moma.org/media/W1siZiIsIjMyODcyMyJdLFsicCIsImNvbnZlcnQiLCItcmVzaXplIDEzNjZ4MTM2Nlx1MDAzZSJdXQ.jpg?sha=5a5b2b935b6cfb3b",
+          "language": "en-US",
+          "location": "New York",
+          "age": 25
+      }"
+
+     ###Output:
      "{
   "art_title": "Starry Night",
   "artist_name": "Vincent van Gogh",

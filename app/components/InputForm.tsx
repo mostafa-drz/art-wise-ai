@@ -45,6 +45,8 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
               type="file"
               name="image"
               id="image"
+              accept="image/*"
+              capture="environment"
               className="mt-1 flex-grow border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-teal-500 focus:border-teal-500"
             />
           </div>

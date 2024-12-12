@@ -16,7 +16,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ messages, isLoading, onSe
   const toggleChat = () => setIsOpen(!isOpen);
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 right-4 z-50 min-w-[25vw]">
       {isOpen ? (
         <div className="flex flex-col h-full max-h-screen overflow-auto mt-10 max-w-3xl bg-white rounded-lg shadow-md">
           <div className="flex justify-between items-center p-4 bg-teal-600 text-white rounded-t-lg">

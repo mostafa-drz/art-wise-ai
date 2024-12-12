@@ -8,6 +8,15 @@ interface FormProps {
   onSubmit: (input: any) => void;
 }
 
+const SUPPORTED_LANGUES: {value:string; label: string}[]= [
+  { value: 'en-US', label: 'English (United States)' },
+  { value: 'en-CA', label: 'English (Canada)' },
+  { value: 'fr-CA', label: 'French (Canada)' },
+  { value: 'fr-FR', label: 'French (France)' },
+  {value: 'de-DE', label: 'German (Germany)'},
+  {value: 'es-ES', label: 'Spanish (Spain)'},
+]
+
 const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) => {
   const [defaultLanguage, setDefaultLanguage] = React.useState<string>('en_US');
 
@@ -51,10 +60,11 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
               defaultValue={defaultLanguage}
               className="flex-1 border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-teal-500 focus:border-teal-500"
             >
-              <option value="en-US">English (United States)</option>
-              <option value="en-CA">English (Canada)</option>
-              <option value="fr-CA">French (Canada)</option>
-              <option value="fr-FR">French (France)</option>
+              {SUPPORTED_LANGUES.map((lang) => (
+                <option key={lang.value} value={lang.value}>
+                  {lang.label}
+                </option>
+              ))}
             </select>
           </div>
 

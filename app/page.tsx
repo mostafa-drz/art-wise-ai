@@ -6,6 +6,7 @@ import Results from './components/Results';
 import ChatContainer from './components/Chat';
 import { Content } from '@google/generative-ai';
 import imageCompression, { Options } from 'browser-image-compression';
+import { GenerateAudioButton } from './components/Audio';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -112,7 +113,12 @@ export default function Home() {
       {loading ? (
         <div className="animate-pulse text-3xl text-gray-600">🤖 Working on it...</div>
       ) : (
-        data && <Results {...data} imageBase64={imageBase64} />
+       
+        data && 
+        <div className='flex flex-col gap-2'>
+         <GenerateAudioButton context={data} />
+         <Results {...data} imageBase64={imageBase64} />
+        </div>
       )}
       {data && (
         <ChatContainer

@@ -12,6 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^5.6.0",
     "@google/generative-ai": "^0.14.1",
     "browser-image-compression": "^2.0.2",
     "next": "^14.2.5",

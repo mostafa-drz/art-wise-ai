@@ -33,3 +33,10 @@ interface ImagePart {
 interface RequestFormData extends Input {
   image?: File;
 }
+
+enum VoiceGender {
+  NEUTRAL='NEUTRAL',
+  MALE='MALE',
+  FEMALE='FEMALE'
+}
+

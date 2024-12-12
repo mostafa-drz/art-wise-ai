@@ -1,9 +1,11 @@
 import { GoogleGenerativeAI, Content } from '@google/generative-ai';
+import textToSpeech, {protos as ttsProtos}from '@google-cloud/text-to-speech';
 
 const API_KEY = process.env.GEMINI_API_KEY || '';
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
 const genAI = new GoogleGenerativeAI(API_KEY);
+const ttsClient = new textToSpeech.TextToSpeechClient();
 
 export async function getInformationFromGemini(input: Input | undefined, imagePart: ImagePart) {
   if (!input) {
@@ -188,3 +190,68 @@ Feel free to ask any questions about it.
     };
   }
 };
+
+/**
+ * Generates a 3-minute podcast script with Gemini covering all aspects of the artwork.
+ */
+export async function generatePodcastScript(context: Output): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: MODEL });
+  const prompt = `
+You are an AI art podcast creator. Generate a concise, engaging 3-minute podcast script based on the following artwork details:
+
+\`\`\`json
+${JSON.stringify(context, null, 2)}
+\`\`\`
+
+### Content Guidelines:
+1. Start with the artwork title and artist name.
+2. Share a brief history of the artwork and its significance.
+3. Explain the technical details of the artwork (visual elements, techniques).
+4. Share one or two fun or historical facts to engage the audience.
+5. End with a smooth conclusion or recommendations for other notable works.
+
+Keep the tone professional, friendly, and engaging. Ensure the script is within 3 minutes when read aloud (around 400-450 words).
+`;
+
+  const result = await model.generateContent([prompt]);
+  return result.response.text();
+}
+
+
+/**
+ * Converts the podcast script into an audio stream (base64) and returns it to the client.
+ */
+export async function generateAudioStream(
+  text: string,
+  languageCode: string = 'en-US',
+  gender: VoiceGender = VoiceGender.NEUTRAL,
+): Promise<string> {
+  const request = {
+    input: { text },
+    voice: { languageCode, ssmlGender: gender },
+    // google.cloud.texttospeech.v1.IAudioConfig
+    audioConfig: { audioEncoding: ttsProtos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
+    
+  };
+
+  const [response] = await ttsClient.synthesizeSpeech(request);
+  // check if the response is an audio content
+  if (!response.audioContent) {
+    throw new Error('No audio content found in the response');
+  }
+  return `data:audio/mp3;base64,${response.audioContent.toString()}`;
+}
+
+/**
+ * Generates a podcast script and converts it to audio.
+ */
+export async function generatePodcast(context: Output, language: string = 'en-US', gender: VoiceGender = VoiceGender.NEUTRAL) {
+  try {
+    const script = await generatePodcastScript(context);
+    const audioBase64 = await generateAudioStream(script, language, gender);
+    return { script, audioBase64 };
+  } catch (error) {
+    console.error('Error generating podcast:', error);
+    throw new Error('Failed to generate podcast. Please try again.');
+  }
+}

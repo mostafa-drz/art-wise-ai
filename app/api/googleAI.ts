@@ -120,12 +120,15 @@ const SYSTEM_CHAT_PROMPT: Content = {
   parts: [
     {
       text: `
-      As an AI art advisor, the user provides you with information about an artwork.
-      You respond to questions based on reliable resources, in a professional, simple, friendly passionate tone.
-      You never provide any fake information, you always provide information based on reliable resources.
-      You receive the artwork information in JSON format.
-      Provide output in markdown format with a beautiful design and style. You can use markdown to style your response.
-    `,
+You are an AI art advisor. Answer questions about artworks using reliable, accurate information. 
+Respond in a professional, friendly, and passionate tone. Use markdown to format your responses beautifully, including:
+
+- **Headers** for key sections.
+- **Bullet points** for lists.
+- **Bold** text for emphasis.
+
+Never invent information; always rely on trustworthy sources.
+`,
     },
   ],
 };
@@ -133,32 +136,55 @@ const SYSTEM_CHAT_PROMPT: Content = {
 export const chatWithGemini = async (
   message: string,
   history: Content[],
-  context: Output,
+  context: Output, // Artwork details
 ): Promise<{ text: string; newHistory: Content[] }> => {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
-  });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
+  // Limit history to avoid performance overhead
+  const MAX_HISTORY_LENGTH = 10;
+  const trimmedHistory = history.slice(-MAX_HISTORY_LENGTH);
+
+  // Add artwork context on first message only
   const historyToUse =
-    history.length > 0
-      ? history
+    trimmedHistory.length > 0
+      ? trimmedHistory
       : [
           {
             role: 'user',
             parts: [
               {
                 text: `
-    I have questions about this art work. Can you provide me more information about it?
+Here is the artwork information for reference:
 
-    ART_WORK_INFORMATION=${JSON.stringify(context)}
-    `,
+\`\`\`json
+${JSON.stringify(context, null, 2)}
+\`\`\`
+
+Feel free to ask any questions about it.
+              `,
               },
             ],
           },
         ];
-  const chat = model.startChat({ history: historyToUse, systemInstruction: SYSTEM_CHAT_PROMPT });
-  const result = await chat.sendMessage(message);
-  const text = result.response.text();
-  const newHistory = await chat.getHistory();
-  return { text, newHistory };
+
+  try {
+    // Start conversation
+    const chat = model.startChat({
+      history: historyToUse,
+      systemInstruction: SYSTEM_CHAT_PROMPT,
+    });
+
+    // Send the user's message
+    const result = await chat.sendMessage(message);
+    const text = result.response.text();
+    const newHistory = await chat.getHistory();
+
+    return { text, newHistory };
+  } catch (error) {
+    console.error('Error in chatWithGemini:', error);
+    return {
+      text: 'Apologies, something went wrong. Please try again later.',
+      newHistory: history,
+    };
+  }
 };

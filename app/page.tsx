@@ -97,12 +97,16 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">Art Wise AI</h1>
-      <p className="text-lg text-gray-700 mb-6">
-        Welcome to Art Wise AI, your personal art advisor. Upload an image or paste an image URL to
-        discover detailed information about any artwork. Learn about the artist, the artwork&rsquo;s
-        history, technical details, and more.
-      </p>
+      <div className="text-center p-6 bg-gray-50 rounded-lg shadow-md mb-4">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+          Welcome to <span className="text-blue-600">Art Wise AI</span> – Your Personal Art Companion
+        </h1>
+        <p className="text-lg text-gray-600 leading-relaxed">
+        Upload an image to unlock the story behind any artwork.  
+        Discover the artist, uncover its history, explore technical details, and enjoy fascinating facts –  
+        all presented beautifully and informatively just for you.
+        </p>
+      </div>
       <InputForm onSubmit={handleSubmit} isLoading={loading} />
       <br />
       {loading ? (

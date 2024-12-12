@@ -1,5 +1,6 @@
 import textToSpeech, {protos as ttsProtos}from '@google-cloud/text-to-speech';
 import { VertexAI, GenerateContentRequest, Content } from '@google-cloud/vertexai';
+import { VoiceGender, Input, ImagePart, Output } from '../types';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
@@ -145,7 +146,7 @@ export const chatWithGemini = async (
   history: Content[],
   context: Output, // Artwork details
 ): Promise<{ text: string; newHistory: Content[] }> => {
-  const model = vertex.getGenerativeModel({ model: 'gemini-1.5-pro' });
+  const model = vertex.getGenerativeModel({ model: MODEL});
 
   // Limit history to avoid performance overhead
   const MAX_HISTORY_LENGTH = 10;
@@ -199,33 +200,60 @@ Feel free to ask any questions about it.
 };
 
 /**
- * Generates a 3-minute podcast script with Gemini covering all aspects of the artwork.
+ * Generates a storytelling script in SSML format using Gemini.
  */
-export async function generatePodcastScript(context: Output): Promise<string> {
+export async function generateAudioSSML(context: Output): Promise<string> {
   const model = vertex.getGenerativeModel({ model: MODEL });
-  const prompt = `
-You are an AI art podcast creator. Generate a concise, engaging 3-minute podcast script based on the following artwork details:
 
+  // Updated prompt to generate SSML
+  const prompt = `
+You are an AI storyteller and SSML expert. Your task is to generate a natural, engaging, and conversational storytelling script about the given artwork in valid SSML format.
+The output should be approximately 3 minutes of audio and covering all aspects of art context provided.
+
+### Artwork Details:
 \`\`\`json
 ${JSON.stringify(context, null, 2)}
 \`\`\`
 
-### Content Guidelines:
-1. Start with the artwork title and artist name.
-2. Share a brief history of the artwork and its significance.
-3. Explain the technical details of the artwork (visual elements, techniques).
-4. Share one or two fun or historical facts to engage the audience.
-5. End with a smooth conclusion or recommendations for other notable works.
+### SSML Content Guidelines:
+1. Wrap the entire script in <speak> tags.
+2. Use <break> tags to introduce natural pauses between sentences or sections.
+   - Short breaks for small pauses: <break time="500ms"/>.
+   - Longer breaks between sections: <break time="1s"/>.
+3. Use <emphasis> tags to highlight key phrases or names.
+4. Adjust speaking rate and pitch naturally using <prosody> where necessary.
+5. Keep the tone conversational, friendly, and engaging.
+6. Ensure the script flows like someone is telling a story, avoiding bullet points or list-like structures.
 
-Keep the tone professional, friendly, and engaging. Ensure the script is within 3 minutes when read aloud (around 400-450 words).
+### Example SSML:
+<speak>
+  This is the artwork titled <emphasis level="strong">Starry Night</emphasis>, painted by <emphasis>Vincent van Gogh</emphasis>. 
+  <break time="500ms"/>
+  Created in 1889, it reflects the artist's view from his asylum room window. 
+  <prosody rate="slow" pitch="high">
+    Notice the swirling patterns in the sky, representing Van Gogh's imaginative mind.
+  </prosody>
+  <break time="1s"/>
+  One interesting fact is that Van Gogh painted this during the day from memory.
+</speak>
+
+### Instructions:
+Generate the entire script in valid SSML. Do not include any additional markdown or JSON format.
 `;
 
-  const result = await model.generateContent(prompt);
-  const script = result.response?.candidates?.[0]?.content?.parts[0]?.text;
-  if (!script) {
-    throw new Error('No podcast script generated');
+  try {
+    const result = await model.generateContent(prompt);
+    const ssml = result.response?.candidates?.[0]?.content?.parts[0]?.text;
+
+    if (!ssml) {
+      throw new Error('No SSML script generated.');
+    }
+
+    return ssml.trim();
+  } catch (error) {
+    console.error('Error generating SSML script:', error);
+    throw new Error('Failed to generate storytelling SSML. Please try again.');
   }
-  return script;
 }
 
 
@@ -233,18 +261,18 @@ Keep the tone professional, friendly, and engaging. Ensure the script is within 
  * Converts the podcast script into an audio stream (base64) and returns it to the client.
  */
 export async function generateAudioStream(
-  text: string,
+  ssml: string,
   languageCode: string = 'en-US',
   gender: VoiceGender = VoiceGender.NEUTRAL,
 ): Promise<string | Uint8Array<ArrayBufferLike>> {
   const request = {
-    input: { text },
+    input: { ssml },
     voice: { languageCode, ssmlGender: gender },
     // google.cloud.texttospeech.v1.IAudioConfig
     audioConfig: { audioEncoding: ttsProtos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
     
   };
-
+  
   const [response] = await ttsClient.synthesizeSpeech(request);
   // check if the response is an audio content
   if (!response.audioContent) {
@@ -258,7 +286,7 @@ export async function generateAudioStream(
  */
 export async function generatePodcast(context: Output, language: string = 'en-US', gender: VoiceGender = VoiceGender.NEUTRAL) {
   try {
-    const script = await generatePodcastScript(context);
+    const script = await generateAudioSSML(context);
     const audio = await generateAudioStream(script, language, gender);
     return { script, audio };
   } catch (error) {

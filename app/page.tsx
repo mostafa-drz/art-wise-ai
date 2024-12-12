@@ -7,6 +7,7 @@ import ChatContainer from './components/Chat';
 import { Content } from '@google-cloud/vertexai';
 import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
+import { Output } from './types';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useGlobalState } from '../context/GlobalState';
 
 interface FormProps {
   errorMessage?: string;
@@ -18,11 +19,8 @@ const SUPPORTED_LANGUES: {value:string; label: string}[]= [
 ]
 
 const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) => {
-  const [defaultLanguage, setDefaultLanguage] = React.useState<string>('en_US');
-
-  React.useEffect(() => {
-    setDefaultLanguage(navigator.language);
-  }, []);
+   const {language,setLanguage} = useGlobalState();
+   
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-100 rounded-lg shadow-md">
@@ -59,8 +57,9 @@ const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) 
             <select
               name="language"
               id="language"
-              defaultValue={defaultLanguage}
+              defaultValue={language}
               className="flex-1 border-gray-300 rounded-md shadow-sm text-sm leading-tight focus:ring-teal-500 focus:border-teal-500"
+              onChange={(e) => setLanguage(e.target.value)}
             >
               {SUPPORTED_LANGUES.map((lang) => (
                 <option key={lang.value} value={lang.value}>

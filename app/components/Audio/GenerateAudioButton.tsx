@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { Output, VoiceGender } from '@/app/types';
+import { useGlobalState } from '@/app/context/GlobalState';
 
-// Define the props expected for the button
 interface GenerateAudioButtonProps {
-  context: Output; // Artwork context, required
-  language?: string; // Optional: language for the audio, default is 'en-US'
-  gender?: VoiceGender; // Optional: voice gender, default is 'NEUTRAL'
+  context: Output;
 }
 
 export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({
   context,
-  language = 'en-US',
-  gender = VoiceGender.NEUTRAL,
 }) => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { language } = useGlobalState();
 
   const generateAudio = async () => {
     setLoading(true);
@@ -26,7 +23,7 @@ export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({
       const response = await fetch('/api/generateAudio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, language, gender }),
+        body: JSON.stringify({ context, language }),
       });
 
       if (!response.ok) throw new Error('Failed to generate audio');

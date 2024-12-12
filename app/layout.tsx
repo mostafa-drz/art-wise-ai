@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { GlobalStateProvider } from './context/GlobalState';
 
 export const metadata: Metadata = {
   title: 'Art Wise AI',
@@ -14,9 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-purple-50">
+        <GlobalStateProvider>
         <main className="min-h-screen w-screen">
           <div className="container mx-auto px-4 py-10">{children}</div>
         </main>
+        </GlobalStateProvider>
       </body>
     </html>
   );

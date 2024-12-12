@@ -236,7 +236,7 @@ export async function generateAudioStream(
   text: string,
   languageCode: string = 'en-US',
   gender: VoiceGender = VoiceGender.NEUTRAL,
-): Promise<string> {
+): Promise<string | Uint8Array<ArrayBufferLike>> {
   const request = {
     input: { text },
     voice: { languageCode, ssmlGender: gender },
@@ -250,7 +250,7 @@ export async function generateAudioStream(
   if (!response.audioContent) {
     throw new Error('No audio content found in the response');
   }
-  return `data:audio/mp3;base64,${response.audioContent.toString()}`;
+  return response.audioContent
 }
 
 /**
@@ -259,8 +259,8 @@ export async function generateAudioStream(
 export async function generatePodcast(context: Output, language: string = 'en-US', gender: VoiceGender = VoiceGender.NEUTRAL) {
   try {
     const script = await generatePodcastScript(context);
-    const audioBase64 = await generateAudioStream(script, language, gender);
-    return { script, audioBase64 };
+    const audio = await generateAudioStream(script, language, gender);
+    return { script, audio };
   } catch (error) {
     console.error('Error generating podcast:', error);
     throw new Error('Failed to generate podcast. Please try again.');

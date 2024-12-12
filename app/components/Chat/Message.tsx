@@ -1,5 +1,5 @@
 import React from 'react';
-import { Content } from '@google/generative-ai';
+import { Content } from '@google-cloud/vertexai';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 

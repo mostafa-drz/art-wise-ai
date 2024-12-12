@@ -1,8 +1,8 @@
-interface Input {
+export interface Input {
   language?: string; // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
 }
 
-interface RecommendedArt {
+export interface RecommendedArt {
   art_title: string;
   artist_name: string;
   date: string;
@@ -10,7 +10,7 @@ interface RecommendedArt {
   link: string;
 }
 
-interface Output {
+export interface Output {
   art_title: string; // the title of the art work
   artist_name: string; // the name of the artist
   date: string; // date the art is created
@@ -23,18 +23,18 @@ interface Output {
   imageBase64?: string;
 }
 
-interface ImagePart {
+export interface ImagePart {
   inlineData: {
     data: string;
     mimeType: string;
   }
 }
 
-interface RequestFormData extends Input {
+export interface RequestFormData extends Input {
   image?: File;
 }
 
-enum VoiceGender {
+export enum VoiceGender {
   NEUTRAL='NEUTRAL',
   MALE='MALE',
   FEMALE='FEMALE'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Content } from '@google/generative-ai';
+import { Content } from '@google-cloud/vertexai';
 import Message from './Message';
 import NewMessage from './NewMessage';
 import ScrollToBottom from 'react-scroll-to-bottom';

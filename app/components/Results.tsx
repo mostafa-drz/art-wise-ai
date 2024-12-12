@@ -1,4 +1,5 @@
 import React from 'react';
+import { Output } from '../types';
 
 interface Props extends Output {}
 

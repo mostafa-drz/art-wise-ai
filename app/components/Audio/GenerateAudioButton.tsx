@@ -1,56 +1,63 @@
-'use client';
-
 import React, { useState } from 'react';
-import {AudioPlayer} from './AudioPlayer';
+import { Output, VoiceGender } from '@/app/types';
 
-interface GeneratePodcastButtonProps {
-  context: any; // Artwork context data
+// Define the props expected for the button
+interface GenerateAudioButtonProps {
+  context: Output; // Artwork context, required
+  language?: string; // Optional: language for the audio, default is 'en-US'
+  gender?: VoiceGender; // Optional: voice gender, default is 'NEUTRAL'
 }
 
-export const GenerateAudioButton: React.FC<GeneratePodcastButtonProps> = ({ context }) => {
-  const [audioBase64, setAudioBase64] = useState<string | null>(null);
+export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({
+  context,
+  language = 'en-US',
+  gender = VoiceGender.NEUTRAL,
+}) => {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGeneratePodcast = async () => {
+  const generateAudio = async () => {
     setLoading(true);
     setError(null);
-    setAudioBase64(null);
 
     try {
-      const res = await fetch('/api/generatePodcast', {
+      // Make sure to pass context, language, and gender
+      const response = await fetch('/api/generateAudio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, language: 'en-US', gender: 'NEUTRAL' }),
+        body: JSON.stringify({ context, language, gender }),
       });
 
-      if (!res.ok) throw new Error('Failed to generate podcast. Please try again.');
-      const { audioBase64 } = await res.json();
+      if (!response.ok) throw new Error('Failed to generate audio');
 
-      setAudioBase64(audioBase64);
-    } catch (e: any) {
-      setError(e.message || 'Something went wrong.');
+      const data = await response.json();
+      setAudioUrl(data.audioUrl); // Set the audio URL returned by the server
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full flex flex-col items-center space-y-4">
-      {!audioBase64 && !loading && (
-        <button
-          onClick={handleGeneratePodcast}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          🎧 Generate Audio 
-        </button>
+    <div className="flex flex-col items-center gap-4">
+      <button
+        onClick={generateAudio}
+        disabled={loading}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+      >
+        {loading ? 'Generating...' : 'Generate Audio'}
+      </button>
+
+      {error && <p className="text-red-600">{error}</p>}
+
+      {audioUrl && (
+        <audio controls>
+          <source src={audioUrl} type="audio/mp3" />
+          Your browser does not support the audio element.
+        </audio>
       )}
-
-      {loading && <p className="text-gray-600 animate-pulse">🔄 Generating audio...</p>}
-
-      {error && <p className="text-red-600 text-sm">{error}</p>}
-
-      {audioBase64 && <AudioPlayer audioBase64={audioBase64} fileName="artwork_podcast.mp3" />}
     </div>
   );
 };

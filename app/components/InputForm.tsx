@@ -9,18 +9,17 @@ interface FormProps {
   onSubmit: (input: any) => void;
 }
 
-const SUPPORTED_LANGUES: {value:string; label: string}[]= [
+const SUPPORTED_LANGUES: { value: string; label: string }[] = [
   { value: 'en-US', label: 'English (United States)' },
   { value: 'en-CA', label: 'English (Canada)' },
   { value: 'fr-CA', label: 'French (Canada)' },
   { value: 'fr-FR', label: 'French (France)' },
-  {value: 'de-DE', label: 'German (Germany)'},
-  {value: 'es-ES', label: 'Spanish (Spain)'},
-]
+  { value: 'de-DE', label: 'German (Germany)' },
+  { value: 'es-ES', label: 'Spanish (Spain)' },
+];
 
 const UploadForm: React.FC<FormProps> = ({ errorMessage, isLoading, onSubmit }) => {
-   const {language,setLanguage} = useGlobalState();
-   
+  const { language, setLanguage } = useGlobalState();
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-100 rounded-lg shadow-md">

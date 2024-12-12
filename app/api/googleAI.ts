@@ -1,4 +1,4 @@
-import textToSpeech, {protos as ttsProtos}from '@google-cloud/text-to-speech';
+import textToSpeech, { protos as ttsProtos } from '@google-cloud/text-to-speech';
 import { VertexAI, GenerateContentRequest, Content } from '@google-cloud/vertexai';
 import { VoiceGender, Input, ImagePart, Output } from '../types';
 
@@ -6,7 +6,7 @@ const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
 const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as string;
 
-const vertex = new VertexAI({project:GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION});
+const vertex = new VertexAI({ project: GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION });
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
 export async function getInformationFromGemini(input: Input | undefined, imagePart: ImagePart) {
@@ -18,13 +18,13 @@ export async function getInformationFromGemini(input: Input | undefined, imagePa
   }
 
   const model = vertex.getGenerativeModel({
-    model: MODEL ,
+    model: MODEL,
     generationConfig: { responseMimeType: 'application/json' },
   });
 
   const prompt = createPrompt(input);
   const request: GenerateContentRequest = {
-    contents: [{role:'user', parts:[{text: prompt}, imagePart]}]
+    contents: [{ role: 'user', parts: [{ text: prompt }, imagePart] }],
   };
   const result = await model.generateContent(request);
   const response = result.response;
@@ -146,7 +146,7 @@ export const chatWithGemini = async (
   history: Content[],
   context: Output, // Artwork details
 ): Promise<{ text: string; newHistory: Content[] }> => {
-  const model = vertex.getGenerativeModel({ model: MODEL});
+  const model = vertex.getGenerativeModel({ model: MODEL });
 
   // Limit history to avoid performance overhead
   const MAX_HISTORY_LENGTH = 10;
@@ -184,9 +184,9 @@ Feel free to ask any questions about it.
 
     // Send the user's message
     const result = await chat.sendMessage(message);
-    const text = result.response?.candidates?.[0]?.content?.parts[0]?.text
+    const text = result.response?.candidates?.[0]?.content?.parts[0]?.text;
     const newHistory = await chat.getHistory();
-    if(!text) {
+    if (!text) {
       throw new Error('No response provided by the model');
     }
     return { text, newHistory };
@@ -256,7 +256,6 @@ Generate the entire script in valid SSML. Do not include any additional markdown
   }
 }
 
-
 /**
  * Converts the podcast script into an audio stream (base64) and returns it to the client.
  */
@@ -270,21 +269,24 @@ export async function generateAudioStream(
     voice: { languageCode, ssmlGender: gender },
     // google.cloud.texttospeech.v1.IAudioConfig
     audioConfig: { audioEncoding: ttsProtos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
-    
   };
-  
+
   const [response] = await ttsClient.synthesizeSpeech(request);
   // check if the response is an audio content
   if (!response.audioContent) {
     throw new Error('No audio content found in the response');
   }
-  return response.audioContent
+  return response.audioContent;
 }
 
 /**
  * Generates a podcast script and converts it to audio.
  */
-export async function generatePodcast(context: Output, language: string = 'en-US', gender: VoiceGender = VoiceGender.NEUTRAL) {
+export async function generatePodcast(
+  context: Output,
+  language: string = 'en-US',
+  gender: VoiceGender = VoiceGender.NEUTRAL,
+) {
   try {
     const script = await generateAudioSSML(context);
     const audio = await generateAudioStream(script, language, gender);

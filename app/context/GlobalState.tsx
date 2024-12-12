@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 
 interface GlobalState {
   language: string;
-  setLanguage: (language: string) => void; 
+  setLanguage: (language: string) => void;
 }
 
 const defaultState: GlobalState = {
@@ -26,17 +26,13 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     setLanguage,
   };
 
-  return (
-    <GlobalStateContext.Provider value={globalState}>
-      {children}
-    </GlobalStateContext.Provider>
-  );
+  return <GlobalStateContext.Provider value={globalState}>{children}</GlobalStateContext.Provider>;
 };
 
 export const useGlobalState = () => {
-    const context = useContext(GlobalStateContext);
-    if (!context) {
-      throw new Error('useGlobalState must be used within a GlobalStateProvider');
-    }
-    return context;
-}
+  const context = useContext(GlobalStateContext);
+  if (!context) {
+    throw new Error('useGlobalState must be used within a GlobalStateProvider');
+  }
+  return context;
+};

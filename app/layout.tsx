@@ -16,9 +16,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-purple-50">
         <GlobalStateProvider>
-        <main className="min-h-screen w-screen">
-          <div className="container mx-auto px-4 py-10">{children}</div>
-        </main>
+          <main className="min-h-screen w-screen">
+            <div className="container mx-auto px-4 py-10">{children}</div>
+          </main>
         </GlobalStateProvider>
       </body>
     </html>

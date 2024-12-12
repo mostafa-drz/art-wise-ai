@@ -27,7 +27,7 @@ export interface ImagePart {
   inlineData: {
     data: string;
     mimeType: string;
-  }
+  };
 }
 
 export interface RequestFormData extends Input {
@@ -35,8 +35,7 @@ export interface RequestFormData extends Input {
 }
 
 export enum VoiceGender {
-  NEUTRAL='NEUTRAL',
-  MALE='MALE',
-  FEMALE='FEMALE'
+  NEUTRAL = 'NEUTRAL',
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
 }
-

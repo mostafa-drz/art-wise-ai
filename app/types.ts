@@ -27,7 +27,7 @@ interface ImagePart {
   inlineData: {
     data: string;
     mimeType: string;
-  };
+  }
 }
 
 interface RequestFormData extends Input {

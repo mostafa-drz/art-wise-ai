@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const aiResponse = await getInformationFromGemini(
     { language: body.language },
-    { inlineData: { data: body.image, mimeType: body.type } },
+    {inlineData:{ data: body.image, mimeType: body.type }},
   );
   const response = new NextResponse(aiResponse, {
     status: 200,

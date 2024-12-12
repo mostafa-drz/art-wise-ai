@@ -1,10 +1,11 @@
-import { GoogleGenerativeAI, Content } from '@google/generative-ai';
 import textToSpeech, {protos as ttsProtos}from '@google-cloud/text-to-speech';
+import { VertexAI, GenerateContentRequest, Content } from '@google-cloud/vertexai';
 
-const API_KEY = process.env.GEMINI_API_KEY || '';
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
+const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as string;
 
-const genAI = new GoogleGenerativeAI(API_KEY);
+const vertex = new VertexAI({project:GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION});
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
 export async function getInformationFromGemini(input: Input | undefined, imagePart: ImagePart) {
@@ -14,15 +15,19 @@ export async function getInformationFromGemini(input: Input | undefined, imagePa
   if (!imagePart) {
     throw Error('No image provided');
   }
-  const model = genAI.getGenerativeModel({
+
+  const model = vertex.getGenerativeModel({
     model: MODEL ,
     generationConfig: { responseMimeType: 'application/json' },
   });
 
   const prompt = createPrompt(input);
-  const result = await model.generateContent([imagePart, prompt]);
+  const request: GenerateContentRequest = {
+    contents: [{role:'user', parts:[{text: prompt}, imagePart]}]
+  };
+  const result = await model.generateContent(request);
   const response = result.response;
-  return response.text();
+  return response.candidates?.[0].content?.parts[0].text;
 }
 
 const createPrompt = (input: Input): string => {
@@ -140,7 +145,7 @@ export const chatWithGemini = async (
   history: Content[],
   context: Output, // Artwork details
 ): Promise<{ text: string; newHistory: Content[] }> => {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+  const model = vertex.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
   // Limit history to avoid performance overhead
   const MAX_HISTORY_LENGTH = 10;
@@ -178,9 +183,11 @@ Feel free to ask any questions about it.
 
     // Send the user's message
     const result = await chat.sendMessage(message);
-    const text = result.response.text();
+    const text = result.response?.candidates?.[0]?.content?.parts[0]?.text
     const newHistory = await chat.getHistory();
-
+    if(!text) {
+      throw new Error('No response provided by the model');
+    }
     return { text, newHistory };
   } catch (error) {
     console.error('Error in chatWithGemini:', error);
@@ -195,7 +202,7 @@ Feel free to ask any questions about it.
  * Generates a 3-minute podcast script with Gemini covering all aspects of the artwork.
  */
 export async function generatePodcastScript(context: Output): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: MODEL });
+  const model = vertex.getGenerativeModel({ model: MODEL });
   const prompt = `
 You are an AI art podcast creator. Generate a concise, engaging 3-minute podcast script based on the following artwork details:
 
@@ -213,8 +220,12 @@ ${JSON.stringify(context, null, 2)}
 Keep the tone professional, friendly, and engaging. Ensure the script is within 3 minutes when read aloud (around 400-450 words).
 `;
 
-  const result = await model.generateContent([prompt]);
-  return result.response.text();
+  const result = await model.generateContent(prompt);
+  const script = result.response?.candidates?.[0]?.content?.parts[0]?.text;
+  if (!script) {
+    throw new Error('No podcast script generated');
+  }
+  return script;
 }
 
 

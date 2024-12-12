@@ -9,7 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "type:check": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.6.0",
@@ -40,7 +40,7 @@
     "typescript": "^5.7.2"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "*.{js,jsx,ts,tsx, json}": [
       "eslint --fix",
       "prettier --write"
     ]

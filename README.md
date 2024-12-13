@@ -1,82 +1,139 @@
-# Art-Wise AI
+# Art Wise AI
 
-Art-Wise AI is an intelligent assistant designed to educate users about various artworks. By leveraging Google Generative AI, the app provides detailed information about artwork based on user-provided image URLs. This project is built with Next.js, Firebase, and various modern development tools.
+Your personal AI-powered art companion – explore the story behind artworks effortlessly.
+
+## Description
+
+Art Wise AI is a web application that allows users to explore the rich history and details of artworks through AI-powered analysis. Simply upload an image of an artwork, and Art Wise AI will provide you with:
+
+- The **art title**, artist name, date, and historical context.
+- **Technical details** such as artistic techniques and visual highlights.
+- Fun facts and additional insights to make art exploration engaging.
+- A **storytelling audio version** that narrates the details in a natural tone.
+
+Built with tools like **Next.js**, **Google Cloud Vertex AI**, and **Text-to-Speech**, Art Wise AI showcases seamless integration of AI technologies in an intuitive web experience.
+
+---
 
 ## Features
 
-- **Artwork Information**: Get comprehensive details about any artwork, including title, artist, date, history, technical details, and fun facts.
-- **Recommendations**: Discover other artworks by the same artist with images and links.
-- **Personalization**: Responses are tailored based on user information like language, location, and age.
+- **AI-Powered Art Analysis**: Upload an image of an artwork, and the app will provide detailed information such as:
 
-## Technology Stack
+  - Title, artist, and creation date.
+  - Historical significance and storytelling context.
+  - Technical details highlighting artistic techniques.
 
-- **Next.js**: For server-side rendering and building the web application.
-- **Firebase**: For backend services and database management.
-- **Google Generative AI**: To generate detailed artwork descriptions.
-- **Tailwind CSS**: For styling the UI.
-- **TypeScript**: For type safety and modern JavaScript development.
-- **ESLint and Prettier**: For maintaining code quality and formatting.
+- **Storytelling Audio**: Generate a natural, narrated audio version of the artwork's story using Google's Text-to-Speech API.
+
+- **Interactive Chat**: Ask follow-up questions about the artwork and receive insightful responses powered by AI.
+
+- **Multi-Language Support**: View responses and audio in your preferred language.
+
+---
+
+## Tech Stack
+
+**Frontend**:
+
+- Next.js (App Router)
+- React
+- TailwindCSS
+
+**Backend**:
+
+- Google Cloud Vertex AI (Gemini API) for AI-powered content generation
+- Google Cloud Text-to-Speech for generating audio narration
+
+---
 
 ## Getting Started
 
-### Prerequisites
+Follow these instructions to set up and run the project locally.
 
-- Node.js and npm installed on your local machine.
-- Firebase account and project setup.
+## Prerequisites
 
-### Installation
+Ensure you have the following:
 
-1. **Clone the repository**:
+- **Node.js** (v18 or higher)
+- **npm** or **yarn**
+- A **Google Cloud Project** with:
+  - Vertex AI API enabled
+  - Text-to-Speech API enabled
+- **Google Cloud credentials** (Service Account JSON file) with the following roles:
+  - **Vertex AI User** (`roles/aiplatform.user`)
+  - **Text-to-Speech Editor** (`roles/texttospeech.editor`)
 
-   ```bash
-   git clone https://github.com/mostafa-drz/art-wise-ai.git
-   cd art-wise-ai
-   ```
+---
 
-2. **Install dependencies**:
+## Installation
 
-   ```bash
-   npm install
-   ```
+1. **Clone the Repository**
 
-3. **Set up Firebase**:
+```bash
+git clone https://github.com/your-username/art-wise-ai.git
+cd art-wise-ai
+```
 
-   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
-   - Add a web app to your Firebase project and get the configuration.
-   - Set up Firebase Admin SDK and generate a service account key.
-   - Copy the Firebase configuration and service account key to your project.
+2. **Install Dependencies**
 
-4. **Configure environment variables**:
-   Create a `.env.local` file in the root of the project and add the following variables:
-   ```bash
-   GEMINI_API_KEY={{YOUR GEMINI API KEY}}
-   GEMINI_MODEL={{GEMINI_MODEL}}
-   ```
+```bash
+npm install
+```
 
-### Running the Application
+3. **Set Up Environment Variables**
+   Create a .env.local file in the root of the project with the following variables:
 
-1. **Start the development server**:
+```
+GCP_PROJECT_ID=your-google-cloud-project-id
+GCP_VERTEX_MODEL_LOCATION=your-gcp-model-location (e.g., us-central1)
+GOOGLE_APPLICATION_CREDENTIALS=path-to-your-service-account.json
+GEMINI_MODEL=gemini-1.5-pro
+```
 
-   ```bash
-   npm run dev
-   ```
+Replace the placeholders with actual values:
+• your-google-cloud-project-id: Your Google Cloud project ID.
+• your-gcp-model-location: The Vertex AI model location (e.g., us-central1).
+• path-to-your-service-account.json: Path to the downloaded service account key JSON file.
 
-2. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+4. **Start the Development Server**
+
+```
+npm run dev
+```
+
+## **Access the App**
+
+Open your browser and navigate to:
+
+```
+http://localhost:3000
+```
 
 ## Usage
 
-- **Upload an artwork image**: Provide an image URL of the artwork you want to learn about.
-- **Receive detailed information**: The app will use Google Generative AI to generate and display detailed information about the artwork.
-- **Explore recommendations**: Discover other artworks by the same artist.
+Once the app is running:
 
-## Contributing
+**Upload an Image**
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure that your code follows the established code style and passes all linting checks.
+Use the upload form to upload an image of an artwork or take a picture directly using your device.
+
+**View Artwork Details**
+
+The app will analyze the image and display:
+
+- **Title**, artist, and creation date.
+- **Historical and technical insights**.
+- **Fun or social facts** about the artwork.
+
+**Generate Audio**
+
+- Click the **"Generate Audio"** button to hear a narrated, storytelling version of the artwork’s details.
+- Play the audio directly on the page or download it.
+
+**Interactive Chat**
+
+Use the chat interface to ask questions and receive AI-powered answers about the artwork.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Contact
-
-For any inquiries or feedback, please contact [Mostafa DRZ](https://github.com/mostafa-drz).
+This project is provided for **learning purposes only** and is intended to demonstrate the capabilities of Generative AI technologies.

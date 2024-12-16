@@ -99,6 +99,10 @@ Replace the placeholders with actual values:
 - your-gcp-model-location: The Vertex AI model location (e.g., us-central1).
 - path-to-your-service-account.json: Path to the downloaded service account key JSON file.
 
+**Note:** Alternatively, you can use the gcloud CLI to configure your project, eliminating the need to create a service account manually. This method is generally recommended for its simplicity and efficiency.
+
+For detailed instructions on setting up the gcloud CLI and initializing your project, refer to the [official Google Cloud documentation](https://cloud.google.com/sdk/docs/initializing).
+
 4. **Start the Development Server**
 
 ```

@@ -64,6 +64,7 @@ export default function Home() {
       if (!fileType.startsWith('image/'))
         throw new Error('Invalid file type. Please upload an image.');
 
+      // There is no technical benefit to do this on the client side, I just wanted to experiment with it
       // compress image on webworker first before sending to server
       const compressedImage = await imageCompression(image, imageCompressingOptions);
 

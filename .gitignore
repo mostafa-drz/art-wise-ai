@@ -37,4 +37,4 @@ next-env.d.ts
 
 firebase-admin-service-account.json
 
-public/temp
+public/temp/

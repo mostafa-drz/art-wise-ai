@@ -2,6 +2,8 @@
 
 Your personal AI-powered art companion – explore the story behind artworks effortlessly.
 [Demo](https://youtube.com/shorts/C7zNHCYIfvc)
+[![Demo Preview 1](/public/assets/screenshot-1.png)](https://youtube.com/shorts/C7zNHCYIfvc)
+[![Demo Preview 2](/public/assets/screenshot-2.png)](https://youtube.com/shorts/C7zNHCYIfvc)
 
 ## Description
 

@@ -91,9 +91,10 @@ GEMINI_MODEL=gemini-1.5-pro
 ```
 
 Replace the placeholders with actual values:
-• your-google-cloud-project-id: Your Google Cloud project ID.
-• your-gcp-model-location: The Vertex AI model location (e.g., us-central1).
-• path-to-your-service-account.json: Path to the downloaded service account key JSON file.
+
+- your-google-cloud-project-id: Your Google Cloud project ID.
+- your-gcp-model-location: The Vertex AI model location (e.g., us-central1).
+- path-to-your-service-account.json: Path to the downloaded service account key JSON file.
 
 4. **Start the Development Server**
 

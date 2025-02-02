@@ -10,6 +10,12 @@ import { GenerateAudioButton } from './components/Audio';
 import { ChatMode, Output } from './types';
 import FloatingActionButton from './components/FloatingActionButton';
 import VoiceChatPanel from './components/VoiceChatPanel';
+import {
+  SessionConfig as VoiceSessionConfig,
+  Modality as VoiceSessionModality,
+} from './context/OpenAIRealtimeWebRTC/types';
+import { createNewVoiceChatSession } from './context/OpenAIRealtimeWebRTC/utils';
+import { useSession as useLiveVoiceSession } from './context/OpenAIRealtimeWebRTC';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -26,6 +32,7 @@ export default function Home() {
   const worker = useRef<Worker>();
   const formData = useRef(new FormData());
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
+  const liveVoiceSession = useLiveVoiceSession();
 
   useEffect(() => {
     worker.current = new Worker('/generateBinaryForImageWorker.js');
@@ -101,6 +108,26 @@ export default function Home() {
     setChatLoading(false);
   }
 
+  async function handleOpenVoiceChat() {
+    if (!data) return;
+
+    setChatMode(ChatMode.VOICE);
+
+    if (!liveVoiceSession.session?.isConnected) {
+      const voiceSessionConfig: VoiceSessionConfig = {
+        modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
+        input_audio_transcription: {
+          model: 'whisper-1',
+        },
+        instructions: `
+        You are an art historian. Provide detailed insights about the artwork with following JSON data ${JSON.stringify(data)}.
+      `,
+      };
+      const newVoiceSession = await createNewVoiceChatSession(voiceSessionConfig);
+      liveVoiceSession.startSession(newVoiceSession);
+    }
+  }
+
   return (
     <div className="flex flex-col items-center">
       <div className="text-center p-6 bg-gray-50 rounded-lg shadow-md mb-4">
@@ -136,15 +163,15 @@ export default function Home() {
       {data && chatMode === ChatMode.VOICE && (
         <VoiceChatPanel
           onClose={() => {
+            liveVoiceSession.closeSession();
             setChatMode(null);
           }}
+          session={liveVoiceSession.session}
         />
       )}
       {data && (
         <FloatingActionButton
-          onStartVoiceChat={() => {
-            setChatMode(ChatMode.VOICE);
-          }}
+          onStartVoiceChat={handleOpenVoiceChat}
           onStartTextChat={() => {
             setChatMode(ChatMode.TEXT);
           }}

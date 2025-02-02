@@ -8,6 +8,7 @@ import { Content } from '@google-cloud/vertexai';
 import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
 import { Output } from './types';
+import FloatingActionButton from './components/FloatingActionButton';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -128,6 +129,12 @@ export default function Home() {
           messages={messages.slice(1)}
           isLoading={chatLoading}
           onSendMessage={handleSendMessage}
+        />
+      )}
+      {data && (
+        <FloatingActionButton
+          onStartVoiceChat={() => console.log('Start Voice Chat')}
+          onStartTextChat={() => console.log('Start Text Chat')}
         />
       )}
     </div>

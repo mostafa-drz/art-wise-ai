@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, X } from 'lucide-react';
 import { RealtimeSession } from '../context/OpenAIRealtimeWebRTC/types';
 
@@ -9,30 +9,40 @@ interface VoiceChatPanelProps {
   session?: RealtimeSession | null;
 }
 
-export default function VoiceChatPanel({ onClose }: VoiceChatPanelProps) {
+export default function VoiceChatPanel({ onClose, session }: VoiceChatPanelProps) {
   const [isMuted, setIsMuted] = useState(false);
-  const [transcript, setTranscript] = useState('This is a placeholder for live transcription...');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleMuteToggle = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+    }
     setIsMuted((prev) => !prev);
   };
+
+  useEffect(() => {
+    const remoteStream = session?.mediaStream;
+
+    if (audioRef.current && remoteStream) {
+      // Attach the stream to the audio element
+      audioRef.current.srcObject = remoteStream;
+    }
+  }, [session?.mediaStream]);
 
   return (
     <div className="fixed bottom-20 right-6 bg-white shadow-xl rounded-xl p-4 w-80 border border-gray-200 z-50">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">🎙️ Voice Chat</h3>
+        <h3 className="text-lg font-semibold">🎙️ Live Voice Chat</h3>
         <button onClick={onClose} className="text-gray-500 hover:text-red-500">
           <X />
         </button>
       </div>
 
-      <p className="text-sm text-gray-600 mb-4">{isMuted ? '🔇 Muted' : '🎤 Listening...'}</p>
+      <p className="text-sm text-gray-600 text-center mb-4">
+        {isMuted ? '🔇 Muted' : session?.isConnected ? '🎤 Streaming...' : 'Connecting...'}
+      </p>
 
-      <div className="h-24 p-2 border rounded-md bg-gray-50 overflow-y-auto text-sm text-gray-700 mb-4">
-        {transcript}
-      </div>
-
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <button
           onClick={handleMuteToggle}
           className={`px-4 py-2 rounded-md shadow ${
@@ -52,6 +62,9 @@ export default function VoiceChatPanel({ onClose }: VoiceChatPanelProps) {
           End Chat
         </button>
       </div>
+
+      {/* Hidden Audio Element */}
+      <audio ref={audioRef} autoPlay controls={false} hidden={false} />
     </div>
   );
 }

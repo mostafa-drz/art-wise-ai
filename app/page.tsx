@@ -11,6 +11,7 @@ import { ChatMode, Output } from './types';
 import FloatingActionButton from './components/FloatingActionButton';
 import VoiceChatPanel from './components/VoiceChatPanel';
 import {
+  TurnDetectionType,
   SessionConfig as VoiceSessionConfig,
   Modality as VoiceSessionModality,
 } from './context/OpenAIRealtimeWebRTC/types';
@@ -122,6 +123,11 @@ export default function Home() {
         instructions: `
         You are an art historian. Provide detailed insights about the artwork with following JSON data ${JSON.stringify(data)}.
       `,
+        turn_detection: {
+          type: TurnDetectionType.SERVER_VAD,
+          threshold: 0.8,
+          silence_duration_ms: 1000,
+        },
       };
       const newVoiceSession = await createNewVoiceChatSession(voiceSessionConfig);
       liveVoiceSession.startSession(newVoiceSession);

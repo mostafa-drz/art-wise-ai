@@ -7,8 +7,9 @@ import ChatContainer from './components/Chat';
 import { Content } from '@google-cloud/vertexai';
 import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
-import { Output } from './types';
+import { ChatMode, Output } from './types';
 import FloatingActionButton from './components/FloatingActionButton';
+import VoiceChatPanel from './components/VoiceChatPanel';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -24,6 +25,7 @@ export default function Home() {
   const [chatLoading, setChatLoading] = useState(false);
   const worker = useRef<Worker>();
   const formData = useRef(new FormData());
+  const [chatMode, setChatMode] = useState<ChatMode | null>(null);
 
   useEffect(() => {
     worker.current = new Worker('/generateBinaryForImageWorker.js');
@@ -124,17 +126,28 @@ export default function Home() {
           </div>
         )
       )}
-      {data && (
+      {data && chatMode === ChatMode.TEXT && (
         <ChatContainer
           messages={messages.slice(1)}
           isLoading={chatLoading}
           onSendMessage={handleSendMessage}
         />
       )}
+      {data && chatMode === ChatMode.VOICE && (
+        <VoiceChatPanel
+          onClose={() => {
+            setChatMode(null);
+          }}
+        />
+      )}
       {data && (
         <FloatingActionButton
-          onStartVoiceChat={() => console.log('Start Voice Chat')}
-          onStartTextChat={() => console.log('Start Text Chat')}
+          onStartVoiceChat={() => {
+            setChatMode(ChatMode.VOICE);
+          }}
+          onStartTextChat={() => {
+            setChatMode(ChatMode.TEXT);
+          }}
         />
       )}
     </div>

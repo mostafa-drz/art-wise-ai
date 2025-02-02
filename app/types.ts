@@ -39,3 +39,8 @@ export enum VoiceGender {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
 }
+
+export enum ChatMode {
+  VOICE = 'voice',
+  TEXT = 'text',
+}

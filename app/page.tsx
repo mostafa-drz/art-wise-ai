@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import InputForm from './components/InputForm';
 import Results from './components/Results';
-import ChatContainer from './components/Chat';
+import TextChatContainer from './components/TextChat';
 import { Content } from '@google-cloud/vertexai';
 import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
@@ -127,7 +127,7 @@ export default function Home() {
         )
       )}
       {data && chatMode === ChatMode.TEXT && (
-        <ChatContainer
+        <TextChatContainer
           messages={messages.slice(1)}
           isLoading={chatLoading}
           onSendMessage={handleSendMessage}

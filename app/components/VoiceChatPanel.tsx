@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { Mic, MicOff, X } from 'lucide-react';
+import { RealtimeSession } from '../context/OpenAIRealtimeWebRTC/types';
 
 interface VoiceChatPanelProps {
   onClose: () => void;
+  session?: RealtimeSession | null;
 }
 
 export default function VoiceChatPanel({ onClose }: VoiceChatPanelProps) {

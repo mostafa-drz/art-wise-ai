@@ -1,4 +1,5 @@
 import { RealtimeSession } from './context/OpenAIRealtimeWebRTC/types';
+import { User as FireStoreUser } from 'firebase/auth';
 export interface Input {
   language?: string; // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
 }
@@ -46,8 +47,15 @@ export enum ChatMode {
   TEXT = 'text',
 }
 
-export interface User {
-  id: string;
-  allTokenUsage?: number;
+export interface TokenUsage {
+  totalTokens: number;
+  lastUsedAt: string; // ISO date string
+}
+export interface User extends FireStoreUser {
+  tokenUsage: {
+    vertexAI: TokenUsage;
+    openAI: TokenUsage;
+  };
   sessions?: RealtimeSession[];
+  isBlocked?: boolean; // Optional flag to block users if they exceed quota
 }

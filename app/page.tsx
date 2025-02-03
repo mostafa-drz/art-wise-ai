@@ -17,6 +17,7 @@ import {
 } from './context/OpenAIRealtimeWebRTC/types';
 import { createNewVoiceChatSession } from './context/OpenAIRealtimeWebRTC/utils';
 import { useSession as useLiveVoiceSession } from './context/OpenAIRealtimeWebRTC';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -135,54 +136,56 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-center p-6 bg-gray-50 rounded-lg shadow-md mb-4">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Welcome to <span className="text-blue-600">Art Wise AI</span> – Your Personal Art
-          Companion
-        </h1>
-        <p className="text-lg text-gray-600 leading-relaxed">
-          Upload an image to unlock the story behind any artwork. Discover the artist, uncover its
-          history, explore technical details, and enjoy fascinating facts – all presented
-          beautifully and informatively just for you.
-        </p>
+    <ProtectedRoute>
+      <div className="flex flex-col items-center">
+        <div className="text-center p-6 bg-gray-50 rounded-lg shadow-md mb-4">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            Welcome to <span className="text-blue-600">Art Wise AI</span> – Your Personal Art
+            Companion
+          </h1>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            Upload an image to unlock the story behind any artwork. Discover the artist, uncover its
+            history, explore technical details, and enjoy fascinating facts – all presented
+            beautifully and informatively just for you.
+          </p>
+        </div>
+        <InputForm onSubmit={handleSubmit} isLoading={loading} />
+        <br />
+        {loading ? (
+          <div className="animate-pulse text-3xl text-gray-600">🤖 Working on it...</div>
+        ) : (
+          data && (
+            <div className="flex flex-col gap-2">
+              <GenerateAudioButton context={data} />
+              <Results {...data} imageBase64={imageBase64} />
+            </div>
+          )
+        )}
+        {data && chatMode === ChatMode.TEXT && (
+          <TextChatContainer
+            messages={messages.slice(1)}
+            isLoading={chatLoading}
+            onSendMessage={handleSendMessage}
+          />
+        )}
+        {data && chatMode === ChatMode.VOICE && (
+          <VoiceChatPanel
+            onClose={() => {
+              liveVoiceSession.closeSession();
+              setChatMode(null);
+            }}
+            session={liveVoiceSession.session}
+          />
+        )}
+        {data && (
+          <FloatingActionButton
+            onStartVoiceChat={handleOpenVoiceChat}
+            onStartTextChat={() => {
+              setChatMode(ChatMode.TEXT);
+            }}
+          />
+        )}
       </div>
-      <InputForm onSubmit={handleSubmit} isLoading={loading} />
-      <br />
-      {loading ? (
-        <div className="animate-pulse text-3xl text-gray-600">🤖 Working on it...</div>
-      ) : (
-        data && (
-          <div className="flex flex-col gap-2">
-            <GenerateAudioButton context={data} />
-            <Results {...data} imageBase64={imageBase64} />
-          </div>
-        )
-      )}
-      {data && chatMode === ChatMode.TEXT && (
-        <TextChatContainer
-          messages={messages.slice(1)}
-          isLoading={chatLoading}
-          onSendMessage={handleSendMessage}
-        />
-      )}
-      {data && chatMode === ChatMode.VOICE && (
-        <VoiceChatPanel
-          onClose={() => {
-            liveVoiceSession.closeSession();
-            setChatMode(null);
-          }}
-          session={liveVoiceSession.session}
-        />
-      )}
-      {data && (
-        <FloatingActionButton
-          onStartVoiceChat={handleOpenVoiceChat}
-          onStartTextChat={() => {
-            setChatMode(ChatMode.TEXT);
-          }}
-        />
-      )}
-    </div>
+    </ProtectedRoute>
   );
 }

@@ -1,3 +1,4 @@
+import { RealtimeSession } from './context/OpenAIRealtimeWebRTC/types';
 export interface Input {
   language?: string; // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
 }
@@ -43,4 +44,10 @@ export enum VoiceGender {
 export enum ChatMode {
   VOICE = 'voice',
   TEXT = 'text',
+}
+
+export interface User {
+  id: string;
+  allTokenUsage?: number;
+  sessions?: RealtimeSession[];
 }

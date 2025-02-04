@@ -312,7 +312,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
       localStream.getAudioTracks().forEach((track) => pc.addTrack(track, localStream));
       // Manage the remote stream
       pc.ontrack = (event) => {
-        console.log(`Remote stream received for session '${sessionId}'.`);
         // update the state for this session with event.streams[0] as mediaStream
         dispatch({
           type: SessionActionType.UPDATE_SESSION,
@@ -350,7 +349,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
           isConnected: true,
         } as RealtimeSession,
       });
-      console.log(`Data channel for session '${sessionId}' is open.`);
     });
 
     dc.addEventListener('message', (e: MessageEvent<string>) => {
@@ -442,7 +440,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
     });
 
     dc.addEventListener('close', () => {
-      console.log(`Session '${sessionId}' closed.`);
       dispatch({
         type: SessionActionType.REMOVE_SESSION,
         payload: { id: sessionId },
@@ -467,7 +464,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
 
     // Apply the SDP answer from the response
     const answer = { type: 'answer' as RTCSdpType, sdp: await response.text() };
-    console.log({ answer });
     await pc.setRemoteDescription(answer);
   };
 
@@ -489,13 +485,11 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
     // Close the data channel if it exists
     if (session.dataChannel) {
       session.dataChannel.close();
-      console.log(`Data channel for session '${sessionId}' closed.`);
     }
 
     // Close the peer connection if it exists
     if (session.peer_connection) {
       session.peer_connection.close();
-      console.log(`Peer connection for session '${sessionId}' closed.`);
     }
 
     // Remove the session from the state
@@ -503,7 +497,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
       type: SessionActionType.REMOVE_SESSION,
       payload: { id: sessionId },
     });
-    console.log(`Session '${sessionId}' removed.`);
   };
 
   /**
@@ -535,7 +528,6 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<{
     // Send the event over the session's data channel
     try {
       dataChannel.send(JSON.stringify(event));
-      console.log(`Event sent to session '${sessionId}':`, event);
     } catch (error) {
       console.error(`Failed to send event to session '${sessionId}':`, error);
     }

@@ -29,6 +29,8 @@ export default function Home() {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
   const liveVoiceSession = useLiveVoiceSession();
+  const audioSession = liveVoiceSession.session;
+
   const auth = useAuth();
   const user = auth.user as User;
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +109,7 @@ export default function Home() {
 
     setChatMode(ChatMode.VOICE);
 
-    if (!liveVoiceSession.session?.isConnected) {
+    if (!audioSession?.isConnected) {
       const voiceSessionConfig: VoiceSessionConfig = {
         modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
         input_audio_transcription: {
@@ -166,14 +168,23 @@ export default function Home() {
             onInputTextChange={setChatInputText}
           />
         )}
-        {data && chatMode === ChatMode.VOICE && (
+        {data && chatMode === ChatMode.VOICE && audioSession && (
           <VoiceChatPanel
             onClose={() => {
               liveVoiceSession.closeSession();
               setChatMode(null);
             }}
-            session={liveVoiceSession.session}
-            user={user}
+            isMuted={audioSession?.isMuted || false}
+            onToggleMute={() => {
+              if (audioSession?.isMuted) {
+                liveVoiceSession.unmuteSessionAudio();
+              } else {
+                liveVoiceSession.muteSessionAudio();
+              }
+            }}
+            mediaStream={audioSession.mediaStream || null}
+            isConnected={audioSession.isConnected || false}
+            isConnecting={audioSession.isConnecting || false}
           />
         )}
         {data && (

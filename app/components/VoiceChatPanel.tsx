@@ -1,79 +1,74 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Mic, MicOff, X } from 'lucide-react';
-import { RealtimeSession } from '../context/OpenAIRealtimeWebRTC/types';
-import { User } from '../types';
-import { handleChargeUser, GenAiType } from '../utils';
+import React, { useEffect, useRef } from 'react';
 
 interface VoiceChatPanelProps {
+  isMuted: boolean;
+  onToggleMute: () => void;
   onClose: () => void;
-  session?: RealtimeSession | null;
-  user: User | null;
+  mediaStream: MediaStream | null;
+  isConnected: boolean;
+  isConnecting: boolean;
 }
 
-export default function VoiceChatPanel({ onClose, session, user }: VoiceChatPanelProps) {
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const handleMuteToggle = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-    }
-    setIsMuted((prev) => !prev);
-  };
-
-  useEffect(() => {
-    const remoteStream = session?.mediaStream;
-
-    if (audioRef.current && remoteStream) {
-      // Attach the stream to the audio element
-      audioRef.current.srcObject = remoteStream;
-    }
-  }, [session?.mediaStream]);
+const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
+  isMuted,
+  onToggleMute,
+  onClose,
+  mediaStream,
+  isConnected,
+  isConnecting,
+}) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if ((session?.tokenUsage?.totalTokens ?? 0) > 0) {
-      handleChargeUser(user as User, GenAiType.liveAudioConversation);
+    if (audioRef.current && mediaStream) {
+      audioRef.current.srcObject = mediaStream;
     }
-  }, [session?.tokenUsage]);
+  }, [mediaStream]);
 
   return (
-    <div className="fixed bottom-20 right-6 bg-white shadow-xl rounded-xl p-4 w-80 border border-gray-200 z-50">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">🎙️ Live Voice Chat</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-red-500">
-          <X />
-        </button>
-      </div>
-
-      <p className="text-sm text-gray-600 text-center mb-4">
-        {isMuted ? '🔇 Muted' : session?.isConnected ? '🎤 Streaming...' : 'Connecting...'}
-      </p>
-
-      <div className="flex justify-between items-center">
-        <button
-          onClick={handleMuteToggle}
-          className={`px-4 py-2 rounded-md shadow ${
-            isMuted
-              ? 'bg-red-500 text-white hover:bg-red-600'
-              : 'bg-green-500 text-white hover:bg-green-600'
-          }`}
-        >
-          {isMuted ? <MicOff className="inline" /> : <Mic className="inline" />}
-          <span className="ml-2">{isMuted ? 'Unmute' : 'Mute'}</span>
-        </button>
-
+    <div className="fixed bottom-4 right-4 z-50 bg-white shadow-md rounded-xl border border-gray-200 p-4 w-80 animate-fade-in transition duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-h3 font-semibold text-primary">Voice Chat</h2>
         <button
           onClick={onClose}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md shadow hover:bg-gray-600"
+          className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-110"
+          title="End Call"
         >
-          End Chat
+          ✖
         </button>
       </div>
 
-      {/* Hidden Audio Element */}
-      <audio ref={audioRef} autoPlay controls={false} hidden={false} />
+      <div className="flex flex-col items-center space-y-4">
+        {isConnecting ? (
+          <div className="text-sm text-gray-500 animate-pulse">Connecting...</div>
+        ) : isConnected ? (
+          <>
+            <audio ref={audioRef} autoPlay muted={isMuted} />
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onToggleMute}
+                className={`px-4 py-2 rounded-md text-white transition-transform transform hover:scale-105 ${
+                  isMuted ? 'bg-gray-400' : 'bg-indigo-500 hover:bg-indigo-600'
+                }`}
+              >
+                {isMuted ? 'Unmute' : 'Mute'}
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-transform transform hover:scale-105"
+              >
+                End Call
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="text-sm text-gray-500">Not Connected</div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default VoiceChatPanel;

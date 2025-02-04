@@ -30,12 +30,15 @@ export default function Home() {
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
   const liveVoiceSession = useLiveVoiceSession();
   const audioSession = liveVoiceSession.session;
-
   const auth = useAuth();
   const user = auth.user as User;
   const [error, setError] = useState<string | null>(null);
   const { sessionId } = useGlobalState();
   const [chatInputText, setChatInputText] = useState('');
+  const [generateAudioLoading, setGenerateAudioLoading] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [generateAudioError, setGenerateAudioError] = useState<string | null>(null);
+  const { language } = useGlobalState();
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -129,6 +132,30 @@ export default function Home() {
     }
   }
 
+  async function generateAudio() {
+    setGenerateAudioLoading(true);
+    setGenerateAudioError(null);
+
+    try {
+      // Make sure to pass context, language, and gender
+      const response = await fetch('/api/generateAudio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context: data, language }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate audio');
+
+      const responseData = await response.json();
+      handleChargeUser(user as User, GenAiType.generateAudioVersion);
+      setAudioUrl(responseData.audioUrl); // Set the audio URL returned by the server
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setGenerateAudioLoading(false);
+    }
+  }
+
   if (user && user.availableCredits && user.availableCredits < 0) {
     return redirect('/not-enough-credits');
   }
@@ -154,7 +181,12 @@ export default function Home() {
         ) : (
           data && (
             <div className="flex flex-col gap-2">
-              <GenerateAudioButton context={data} user={user} />
+              <GenerateAudioButton
+                onGenerateAudio={generateAudio}
+                audioUrl={audioUrl}
+                isLoading={generateAudioLoading}
+                error={generateAudioError}
+              />
               <Results {...data} />
             </div>
           )

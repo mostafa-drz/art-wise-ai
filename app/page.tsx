@@ -1,44 +1,58 @@
 'use client';
 
+// React & Next.js Core
 import { useState } from 'react';
-import TextChat from './components/TextChat';
+import { redirect } from 'next/navigation';
+
+// Third-Party Libraries
 import { Content } from '@google-cloud/vertexai';
-import { ChatMode, Output, User } from './types';
+
+// Context & Hooks
+import { useAuth } from '@/context/Auth';
+import { useGlobalState } from '@/context/GlobalState';
+import { useSession as useLiveVoiceSession } from '@/context/OpenAIRealtimeWebRTC';
+
+// Types
+import { ChatMode, Output, User } from '@/types';
 import {
   TurnDetectionType,
   SessionConfig as VoiceSessionConfig,
   Modality as VoiceSessionModality,
-} from './context/OpenAIRealtimeWebRTC/types';
-import { createNewVoiceChatSession } from './context/OpenAIRealtimeWebRTC/utils';
-import { useSession as useLiveVoiceSession } from './context/OpenAIRealtimeWebRTC';
-import ProtectedRoute from './components/ProtectedRoute';
-import { handleChargeUser, GenAiType } from './utils';
-import { useAuth } from './context/Auth';
-import { redirect } from 'next/navigation';
-import { useGlobalState } from './context/GlobalState';
-import * as api from './utils/api';
-import HeaderSection from './components/ArtCompanionBot/HeaderSection';
-import UploadSection from './components/ArtCompanionBot/UploadSection';
-import ResultsSection from './components/ArtCompanionBot/ResultsSection';
-import ChatSection from './components/ArtCompanionBot/ChatSection';
+} from '@/context/OpenAIRealtimeWebRTC/types';
+
+// Utils & API
+import * as api from '@/utils/api';
+import { handleChargeUser, GenAiType } from '@/utils';
+
+// Components
+import ProtectedRoute from '@/components/ProtectedRoute';
+import LoadingIndicator from '@/components/LoadingIndicator';
+import HeaderSection from '@/components/ArtCompanionBot/HeaderSection';
+import UploadSection from '@/components/ArtCompanionBot/UploadSection';
+import ResultsSection from '@/components/ArtCompanionBot/ResultsSection';
+import ChatSection from '@/components/ArtCompanionBot/ChatSection';
+
+// Realtime Utilities
+import { createNewVoiceChatSession } from '@/context/OpenAIRealtimeWebRTC/utils';
 
 export default function Home() {
-  const [data, setData] = useState<Output | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<Content[]>([]);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [chatInputText, setChatInputText] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
-  const liveVoiceSession = useLiveVoiceSession();
-  const audioSession = liveVoiceSession.session;
+  const [data, setData] = useState<Output | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [generateAudioError, setGenerateAudioError] = useState<string | null>(null);
+  const [generateAudioLoading, setGenerateAudioLoading] = useState(false);
+  const [isFloatingButtonExpanded, setIsFloatingButtonExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<Content[]>([]);
+
   const auth = useAuth();
   const user = auth.user as User;
-  const [error, setError] = useState<string | null>(null);
-  const [chatInputText, setChatInputText] = useState('');
-  const [generateAudioLoading, setGenerateAudioLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [generateAudioError, setGenerateAudioError] = useState<string | null>(null);
+  const liveVoiceSession = useLiveVoiceSession();
+  const audioSession = liveVoiceSession.session;
   const { language } = useGlobalState();
-  const [isFloatingButtonExpanded, setIsFloatingButtonExpanded] = useState(false);
 
   async function handleSendMessage() {
     setChatLoading(true);
@@ -121,12 +135,10 @@ export default function Home() {
       <div className="flex flex-col items-center">
         <HeaderSection />
         <UploadSection user={user} onSuccess={setData} onError={setError} />
-        <br />
-        {loading ? (
-          <div className="animate-pulse text-3xl text-gray-600">🤖 Working on it...</div>
-        ) : (
-          data && (
-            <div className="flex flex-col gap-2">
+
+        <LoadingIndicator isLoading={loading}>
+          {data && (
+            <>
               <ResultsSection
                 data={data}
                 user={user}
@@ -135,46 +147,32 @@ export default function Home() {
                 error={generateAudioError}
                 onGenerateAudio={generateAudio}
               />
-            </div>
-          )
-        )}
-        {data && chatMode === ChatMode.TEXT && (
-          <TextChat
-            messages={messages.slice(1)}
-            isLoading={chatLoading}
-            onSendMessage={handleSendMessage}
-            inputText={chatInputText}
-            onInputTextChange={setChatInputText}
-          />
-        )}
-
-        {data && (
-          <ChatSection
-            data={data}
-            messages={messages}
-            chatMode={chatMode}
-            isLoading={chatLoading}
-            chatInputText={chatInputText}
-            isFloatingButtonExpanded={isFloatingButtonExpanded}
-            audioSession={audioSession}
-            onSendMessage={handleSendMessage}
-            onInputTextChange={setChatInputText}
-            onOpenVoiceChat={handleOpenVoiceChat}
-            onStartTextChat={() => setChatMode(ChatMode.TEXT)}
-            onCloseVoiceChat={() => {
-              liveVoiceSession.closeSession();
-              setChatMode(null);
-            }}
-            onToggleMute={() => {
-              if (audioSession?.isMuted) {
-                liveVoiceSession.unmuteSessionAudio();
-              } else {
-                liveVoiceSession.muteSessionAudio();
-              }
-            }}
-            onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
-          />
-        )}
+              <ChatSection
+                data={data}
+                messages={messages}
+                chatMode={chatMode}
+                isLoading={chatLoading}
+                chatInputText={chatInputText}
+                isFloatingButtonExpanded={isFloatingButtonExpanded}
+                audioSession={audioSession}
+                onSendMessage={handleSendMessage}
+                onInputTextChange={setChatInputText}
+                onOpenVoiceChat={handleOpenVoiceChat}
+                onStartTextChat={() => setChatMode(ChatMode.TEXT)}
+                onCloseVoiceChat={() => {
+                  liveVoiceSession.closeSession();
+                  setChatMode(null);
+                }}
+                onToggleMute={() => {
+                  audioSession?.isMuted
+                    ? liveVoiceSession.unmuteSessionAudio()
+                    : liveVoiceSession.muteSessionAudio();
+                }}
+                onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
+              />
+            </>
+          )}
+        </LoadingIndicator>
       </div>
     </ProtectedRoute>
   );

@@ -21,6 +21,7 @@ import { handleChargeUser, GenAiType, MAX_IMAGE_FILE_SIZE, uploadImageToFirebase
 import { useAuth } from './context/Auth';
 import { redirect } from 'next/navigation';
 import { useGlobalState } from './context/GlobalState';
+import * as api from './utils/api';
 
 export default function Home() {
   const [data, setData] = useState<Output | null>(null);
@@ -44,11 +45,9 @@ export default function Home() {
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
+    const image = formData.get('image') as File;
 
     try {
-      const image = formData.get('image') as File;
-      const language = formData.get('language') as string;
-
       if (!image) throw new Error('No image provided');
 
       // Validate file type
@@ -67,16 +66,9 @@ export default function Home() {
       uploadFormData.append('imageURL', imageURL);
       uploadFormData.append('language', language);
 
-      const res = await fetch('/api/identify', {
-        method: 'POST',
-        body: uploadFormData,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const responseData = await res.json();
-      handleChargeUser(user, GenAiType.newSearch);
-      setData(responseData);
+      const { data, error } = await api.identifyArtwork({ user, imageURL, language });
+      setData(data);
+      setError(error);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong.');
@@ -87,21 +79,22 @@ export default function Home() {
 
   async function handleSendMessage() {
     setChatLoading(true);
+    setError(null);
 
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: chatInputText, history: messages, context: data }),
+    const res = await api.sendMessage({
+      user,
+      message: chatInputText,
+      history: messages,
+      context: data,
     });
 
-    if (!res.ok) {
+    if (res.error) {
+      setError(res.error);
       setChatLoading(false);
-      throw new Error(await res.text());
+      return;
     }
 
-    const { newHistory } = await res.json();
+    const { newHistory } = res.data;
     handleChargeUser(user, GenAiType.textConversation);
     setMessages(newHistory);
     setChatLoading(false);
@@ -138,16 +131,15 @@ export default function Home() {
     setGenerateAudioError(null);
 
     try {
-      // Make sure to pass context, language, and gender
-      const response = await fetch('/api/generateAudio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context: data, language }),
-      });
+      const response = await api.generateAudio({ user, context: data, language });
+      if (response.error) {
+        setGenerateAudioError(response.error);
+        setGenerateAudioLoading(false);
+        return;
+      }
 
-      if (!response.ok) throw new Error('Failed to generate audio');
+      const responseData = response?.data;
 
-      const responseData = await response.json();
       handleChargeUser(user as User, GenAiType.generateAudioVersion);
       setAudioUrl(responseData.audioUrl); // Set the audio URL returned by the server
     } catch (err: any) {

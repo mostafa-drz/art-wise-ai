@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import InputForm from './components/InputForm';
 import Results from './components/Results';
 import TextChatContainer from './components/TextChat';
 import { Content } from '@google-cloud/vertexai';
-import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
 import { ChatMode, Output, User } from './types';
 import FloatingActionButton from './components/FloatingActionButton';
@@ -18,79 +17,63 @@ import {
 import { createNewVoiceChatSession } from './context/OpenAIRealtimeWebRTC/utils';
 import { useSession as useLiveVoiceSession } from './context/OpenAIRealtimeWebRTC';
 import ProtectedRoute from './components/ProtectedRoute';
-import { handleChargeUser, GenAiType } from './utils';
+import { handleChargeUser, GenAiType, MAX_IMAGE_FILE_SIZE, uploadImageToFirebase } from './utils';
 import { useAuth } from './context/Auth';
 import { redirect } from 'next/navigation';
-
-const imageCompressingOptions: Options = {
-  maxSizeMB: 1,
-  maxWidthOrHeight: 800,
-  useWebWorker: true,
-};
+import { useGlobalState } from './context/GlobalState';
 
 export default function Home() {
   const [data, setData] = useState<Output | null>(null);
   const [loading, setLoading] = useState(false);
-  const [imageBase64, setImageBase64] = useState<string>('');
   const [messages, setMessages] = useState<Content[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
-  const worker = useRef<Worker>();
-  const formData = useRef(new FormData());
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
   const liveVoiceSession = useLiveVoiceSession();
   const auth = useAuth();
-  const user = auth.user;
+  const user = auth.user as User;
+  const [error, setError] = useState<string | null>(null);
+  const { sessionId } = useGlobalState();
 
-  useEffect(() => {
-    worker.current = new Worker('/generateBinaryForImageWorker.js');
-
-    worker.current.onmessage = async (e) => {
-      if (typeof e.data !== 'string') throw new Error('Invalid data type');
-      const base64String = e.data;
-      const language = formData.current.get('language') as string;
-      const fileType = (formData.current.get('image') as File).type;
-      setImageBase64(base64String);
-      const res = await fetch('/api/identify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ image: base64String, language, type: fileType }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const responseData = await res.json();
-      handleChargeUser(auth.user as User, GenAiType.newSearch);
-      setData(responseData); // Set the response data to state
-      setLoading(false); // Stop loading
-    };
-  }, []);
-  // Handle messages from the worker
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    if (!worker.current) return;
-
-    e.preventDefault();
-    setLoading(true); // Start loading
+  async function handleSubmit(formData: FormData) {
+    setLoading(true);
+    setError(null);
 
     try {
-      formData.current = new FormData(e.target as HTMLFormElement);
-      const image = formData.current.get('image') as File;
+      const image = formData.get('image') as File;
+      const language = formData.get('language') as string;
 
       if (!image) throw new Error('No image provided');
 
-      const fileType = image.type; // Get MIME type of the image
-      if (!fileType.startsWith('image/'))
+      // Validate file type
+      if (!image.type.startsWith('image/')) {
         throw new Error('Invalid file type. Please upload an image.');
+      }
 
-      // There is no technical benefit to do this on the client side, I just wanted to experiment with it
-      // compress image on webworker first before sending to server
-      const compressedImage = await imageCompression(image, imageCompressingOptions);
+      // Validate file size (max 5MB)
+      if (image.size > MAX_IMAGE_FILE_SIZE) {
+        throw new Error('Image size exceeds the 5MB limit.');
+      }
 
-      // Send the file to the worker for processing
-      worker.current.postMessage(compressedImage);
-    } catch (e: any) {
-      // Handle errors here
-      console.error(e);
+      // Directly send the image to the backend without conversion
+      const uploadFormData = new FormData();
+      const imageURL = await uploadImageToFirebase(user.uid, sessionId, image);
+      uploadFormData.append('imageURL', imageURL);
+      uploadFormData.append('language', language);
+
+      const res = await fetch('/api/identify', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      const responseData = await res.json();
+      handleChargeUser(user, GenAiType.newSearch);
+      setData(responseData);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Something went wrong.');
+    } finally {
       setLoading(false);
     }
   }
@@ -112,7 +95,6 @@ export default function Home() {
     }
 
     const { newHistory } = await res.json();
-    const user = auth.user as User;
     handleChargeUser(user, GenAiType.textConversation);
     setMessages(newHistory);
     setChatLoading(false);
@@ -161,15 +143,15 @@ export default function Home() {
             beautifully and informatively just for you.
           </p>
         </div>
-        <InputForm onSubmit={handleSubmit} isLoading={loading} />
+        <InputForm onSubmit={handleSubmit} isLoading={loading} error={error} />
         <br />
         {loading ? (
           <div className="animate-pulse text-3xl text-gray-600">🤖 Working on it...</div>
         ) : (
           data && (
             <div className="flex flex-col gap-2">
-              <GenerateAudioButton context={data} user={auth.user} />
-              <Results {...data} imageBase64={imageBase64} />
+              <GenerateAudioButton context={data} user={user} />
+              <Results {...data} />
             </div>
           )
         )}
@@ -187,7 +169,7 @@ export default function Home() {
               setChatMode(null);
             }}
             session={liveVoiceSession.session}
-            user={auth.user}
+            user={user}
           />
         )}
         {data && (

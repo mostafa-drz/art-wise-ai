@@ -22,7 +22,7 @@ export interface Output {
   other_facts: string; // any fun cats, social or historical facts about it
   originalImageURL: string; // the original image URL
   recommended: RecommendedArt[];
-  imageBase64?: string;
+  imageURL?: string; // the image URL
 }
 
 export interface ImagePart {

@@ -12,10 +12,11 @@ import { getServices } from '../utils/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import * as db from '../utils/db';
 import { User } from '../types';
+import { User as FireStoreUser } from 'firebase/auth';
 
 // Define the Auth Context Type
 interface AuthContextType {
-  user: User | null;
+  user: User | FireStoreUser | null;
   loading: boolean;
   sendSignInEmail: (email: string) => Promise<void>;
   handleSignInWithEmailLink: () => Promise<void>;
@@ -27,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Provide the Auth Context
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | FireStoreUser>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Use `getServices` to access Firebase services
@@ -35,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const auth = firebaseServices?.auth;
 
   useEffect(() => {
+    if (!auth) return;
     // Monitor auth state
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -44,6 +46,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [auth]);
 
   const sendSignInEmail = async (email: string): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase auth not initialized');
+    }
     const actionCodeSettings = {
       url: `${window.location.origin}/auth/callback`,
       handleCodeInApp: true,
@@ -60,6 +65,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const handleSignInWithEmailLink = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase auth not initialized');
+    }
     try {
       const email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
@@ -98,6 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user?.uid]);
 
   const logout = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase auth not initialized');
+    }
     try {
       await signOut(auth);
       setUser(null);

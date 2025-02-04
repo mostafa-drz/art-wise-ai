@@ -12,7 +12,7 @@ const Results: React.FC<Props> = ({
   technical_details,
   other_facts,
   recommended,
-  imageBase64,
+  imageURL,
 }) => {
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -21,7 +21,7 @@ const Results: React.FC<Props> = ({
       </div>
       <div className="w-full h-64 sm:h-96 relative overflow-hidden">
         <img
-          src={`data:image/jpeg;base64, ${imageBase64}`}
+          src={imageURL}
           alt="Original Artwork"
           loading="lazy"
           className="object-contain w-full h-full"

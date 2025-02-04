@@ -4,7 +4,6 @@ import { GlobalStateProvider } from './context/GlobalState';
 import { OpenAIRealtimeWebRTCProvider } from './context/OpenAIRealtimeWebRTC';
 import { AuthProvider } from './context/Auth';
 import Header from './components/Header';
-import { useAuth } from './context/Auth';
 
 export const metadata: Metadata = {
   title: 'Art Wise AI',
@@ -16,7 +15,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, logout } = useAuth();
   return (
     <html lang="en">
       <body className="bg-purple-50">
@@ -24,7 +22,7 @@ export default function RootLayout({
           <GlobalStateProvider>
             <OpenAIRealtimeWebRTCProvider>
               <main className="min-h-screen w-screen">
-                <Header user={user} logout={logout} />
+                <Header />
                 <div className="container mx-auto px-4 py-10">{children}</div>
               </main>
             </OpenAIRealtimeWebRTCProvider>

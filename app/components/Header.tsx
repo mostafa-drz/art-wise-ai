@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
+import { useAuth } from '../context/Auth';
 import Link from 'next/link';
-import { User } from '../types';
 
-interface HeaderProps {
-  user?: User | null;
-  logout: () => void;
-}
-const Header: React.FC<HeaderProps> = ({ user, logout }) => {
+const Header: React.FC = () => {
+  const { user, logout } = useAuth();
+
   return (
     <header className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md text-white py-4 px-6 flex justify-between items-center">
       {/* Logo/Brand */}

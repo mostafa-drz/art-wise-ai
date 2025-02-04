@@ -16,7 +16,7 @@ import { User as FireStoreUser } from 'firebase/auth';
 
 // Define the Auth Context Type
 interface AuthContextType {
-  user: User | null;
+  user: User | FireStoreUser | null;
   loading: boolean;
   sendSignInEmail: (email: string) => Promise<void>;
   handleSignInWithEmailLink: () => Promise<void>;

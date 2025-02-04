@@ -39,6 +39,7 @@ export default function Home() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [generateAudioError, setGenerateAudioError] = useState<string | null>(null);
   const { language } = useGlobalState();
+  const [isFloatingButtonExpanded, setIsFloatingButtonExpanded] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -225,6 +226,8 @@ export default function Home() {
             onStartTextChat={() => {
               setChatMode(ChatMode.TEXT);
             }}
+            isExpanded={isFloatingButtonExpanded}
+            onToggleExpand={() => setIsFloatingButtonExpanded((prev) => !prev)}
           />
         )}
       </div>

@@ -3,9 +3,19 @@
 import { useState } from 'react';
 import { Mic, MessageCircle, Plus, X } from 'lucide-react';
 
-export default function FloatingActionButton({ onStartVoiceChat, onStartTextChat }: any) {
-  const [isExpanded, setIsExpanded] = useState(false);
+interface FloatingActionButtonProps {
+  onStartVoiceChat: () => void;
+  onStartTextChat: () => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+}
 
+export default function FloatingActionButton({
+  onStartVoiceChat,
+  onStartTextChat,
+  isExpanded,
+  onToggleExpand,
+}: FloatingActionButtonProps) {
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-50">
       {isExpanded && (
@@ -13,7 +23,7 @@ export default function FloatingActionButton({ onStartVoiceChat, onStartTextChat
           <button
             onClick={() => {
               onStartVoiceChat();
-              setIsExpanded(false);
+              onToggleExpand();
             }}
             className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg transition-transform transform hover:scale-105"
           >
@@ -22,7 +32,7 @@ export default function FloatingActionButton({ onStartVoiceChat, onStartTextChat
           <button
             onClick={() => {
               onStartTextChat();
-              setIsExpanded(false);
+              onToggleExpand();
             }}
             className="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg transition-transform transform hover:scale-105"
           >
@@ -32,7 +42,7 @@ export default function FloatingActionButton({ onStartVoiceChat, onStartTextChat
       )}
 
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => onToggleExpand()}
         className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-xl transition-transform transform hover:rotate-90"
       >
         {isExpanded ? <X /> : <Plus />}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import InputForm from './components/InputForm';
 import Results from './components/Results';
-import TextChatContainer from './components/TextChat';
+import TextChat from './components/TextChat';
 import { Content } from '@google-cloud/vertexai';
 import { GenerateAudioButton } from './components/Audio';
 import { ChatMode, Output, User } from './types';
@@ -33,6 +33,7 @@ export default function Home() {
   const user = auth.user as User;
   const [error, setError] = useState<string | null>(null);
   const { sessionId } = useGlobalState();
+  const [chatInputText, setChatInputText] = useState('');
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -78,7 +79,7 @@ export default function Home() {
     }
   }
 
-  async function handleSendMessage(content: string) {
+  async function handleSendMessage() {
     setChatLoading(true);
 
     const res = await fetch('/api/chat', {
@@ -86,7 +87,7 @@ export default function Home() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: content, history: messages, context: data }),
+      body: JSON.stringify({ message: chatInputText, history: messages, context: data }),
     });
 
     if (!res.ok) {
@@ -98,6 +99,7 @@ export default function Home() {
     handleChargeUser(user, GenAiType.textConversation);
     setMessages(newHistory);
     setChatLoading(false);
+    setChatInputText('');
   }
 
   async function handleOpenVoiceChat() {
@@ -156,10 +158,12 @@ export default function Home() {
           )
         )}
         {data && chatMode === ChatMode.TEXT && (
-          <TextChatContainer
+          <TextChat
             messages={messages.slice(1)}
             isLoading={chatLoading}
             onSendMessage={handleSendMessage}
+            inputText={chatInputText}
+            onInputTextChange={setChatInputText}
           />
         )}
         {data && chatMode === ChatMode.VOICE && (

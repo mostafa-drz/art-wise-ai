@@ -1,31 +1,37 @@
+'use client';
+
 import React from 'react';
 import { Content } from '@google-cloud/vertexai';
 import Message from './Message';
-import NewMessage from './NewMessage';
 import ScrollToBottom from 'react-scroll-to-bottom';
+import NewMessage from './NewMessage';
 
-interface TextChatContainerProps {
+interface TextChatProps {
   messages: Content[];
   isLoading: boolean;
-  onSendMessage: (content: string) => void;
+  onSendMessage: () => void;
+  inputText: string;
+  onInputTextChange: (text: string) => void;
 }
 
-const TextChatContainer: React.FC<TextChatContainerProps> = ({
+const TextChat: React.FC<TextChatProps> = ({
   messages,
   isLoading,
   onSendMessage,
+  inputText,
+  onInputTextChange,
 }) => {
   return (
     <div className="fixed bottom-4 right-4 z-50 min-w-[25vw]">
-      <div className="flex flex-col h-full max-h-screen overflow-auto mt-10 max-w-3xl bg-white rounded-lg shadow-md">
-        <ScrollToBottom className="flex-grow overflow-y-auto p-4">
+      <div className="flex flex-col h-full max-h-screen overflow-auto mt-10 max-w-3xl bg-white rounded-lg shadow-md border border-gray-200">
+        <ScrollToBottom className="flex-grow overflow-y-auto p-4 space-y-2">
           {messages.map((message, index) => (
             <Message key={index} message={message} />
           ))}
           {isLoading && (
             <div className="flex justify-center my-2">
               <svg
-                className="animate-spin h-5 w-5 text-teal-600"
+                className="animate-spin h-6 w-6 text-indigo-500"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -47,10 +53,16 @@ const TextChatContainer: React.FC<TextChatContainerProps> = ({
             </div>
           )}
         </ScrollToBottom>
-        <NewMessage onSend={onSendMessage} isLoading={isLoading} />
+
+        <NewMessage
+          onSend={onSendMessage}
+          isLoading={isLoading}
+          value={inputText}
+          onChange={onInputTextChange}
+        />
       </div>
     </div>
   );
 };
 
-export default TextChatContainer;
+export default TextChat;

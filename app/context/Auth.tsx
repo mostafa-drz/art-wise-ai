@@ -7,10 +7,11 @@ import {
   signInWithEmailLink,
   signOut,
   onAuthStateChanged,
-  User,
 } from 'firebase/auth';
 import { getServices } from '../utils/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import * as db from '../utils/db';
+import { User } from '../types';
 
 // Define the Auth Context Type
 interface AuthContextType {
@@ -70,9 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userId = result.user.uid;
         const dbUser = await db.getUser(userId);
         if (!dbUser) {
-          await db.createUser({
-            id: userId,
-          });
+          await db.createUser(result.user as User);
         }
         setUser(result.user);
         window.localStorage.removeItem('emailForSignIn');
@@ -82,6 +81,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(error.message);
     }
   };
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const userId = user.uid;
+    const usersCollection = db.getUsersCollection();
+    const userDoc = doc(usersCollection, userId);
+    const unsubscribe = onSnapshot(userDoc, (doc: any) => {
+      if (doc.exists()) {
+        const userData = doc.data() as User;
+        setUser((currentData) => ({ ...currentData, ...userData }));
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user?.uid]);
 
   const logout = async (): Promise<void> => {
     try {

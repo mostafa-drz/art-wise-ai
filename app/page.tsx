@@ -7,7 +7,7 @@ import TextChatContainer from './components/TextChat';
 import { Content } from '@google-cloud/vertexai';
 import imageCompression, { Options } from 'browser-image-compression';
 import { GenerateAudioButton } from './components/Audio';
-import { ChatMode, Output } from './types';
+import { ChatMode, Output, User } from './types';
 import FloatingActionButton from './components/FloatingActionButton';
 import VoiceChatPanel from './components/VoiceChatPanel';
 import {
@@ -18,6 +18,9 @@ import {
 import { createNewVoiceChatSession } from './context/OpenAIRealtimeWebRTC/utils';
 import { useSession as useLiveVoiceSession } from './context/OpenAIRealtimeWebRTC';
 import ProtectedRoute from './components/ProtectedRoute';
+import { handleChargeUser, GenAiType } from './utils';
+import { useAuth } from './context/Auth';
+import { redirect } from 'next/navigation';
 
 const imageCompressingOptions: Options = {
   maxSizeMB: 1,
@@ -35,6 +38,8 @@ export default function Home() {
   const formData = useRef(new FormData());
   const [chatMode, setChatMode] = useState<ChatMode | null>(null);
   const liveVoiceSession = useLiveVoiceSession();
+  const auth = useAuth();
+  const user = auth.user;
 
   useEffect(() => {
     worker.current = new Worker('/generateBinaryForImageWorker.js');
@@ -54,6 +59,7 @@ export default function Home() {
       });
       if (!res.ok) throw new Error(await res.text());
       const responseData = await res.json();
+      handleChargeUser(auth.user as User, GenAiType.newSearch);
       setData(responseData); // Set the response data to state
       setLoading(false); // Stop loading
     };
@@ -106,6 +112,8 @@ export default function Home() {
     }
 
     const { newHistory } = await res.json();
+    const user = auth.user as User;
+    handleChargeUser(user, GenAiType.textConversation);
     setMessages(newHistory);
     setChatLoading(false);
   }
@@ -135,6 +143,10 @@ export default function Home() {
     }
   }
 
+  if (user && user.availableCredits && user.availableCredits < 0) {
+    return redirect('/not-enough-credits');
+  }
+
   return (
     <ProtectedRoute>
       <div className="flex flex-col items-center">
@@ -156,7 +168,7 @@ export default function Home() {
         ) : (
           data && (
             <div className="flex flex-col gap-2">
-              <GenerateAudioButton context={data} />
+              <GenerateAudioButton context={data} user={auth.user} />
               <Results {...data} imageBase64={imageBase64} />
             </div>
           )
@@ -175,6 +187,7 @@ export default function Home() {
               setChatMode(null);
             }}
             session={liveVoiceSession.session}
+            user={auth.user}
           />
         )}
         {data && (

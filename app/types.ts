@@ -47,15 +47,9 @@ export enum ChatMode {
   TEXT = 'text',
 }
 
-export interface TokenUsage {
-  totalTokens: number;
-  lastUsedAt: string; // ISO date string
-}
 export interface User extends FireStoreUser {
-  tokenUsage: {
-    vertexAI: TokenUsage;
-    openAI: TokenUsage;
-  };
+  availableCredits: number;
+  usedCredits: number;
   sessions?: RealtimeSession[];
-  isBlocked?: boolean; // Optional flag to block users if they exceed quota
+  isBlocked?: boolean;
 }

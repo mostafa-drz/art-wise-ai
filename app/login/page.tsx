@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/Auth';
-import OnlyUnAuthenticated from '../components/OnlyUnAuthenticated';
+import OnlyUnauthenticated from '../components/OnlyUnauthenticated';
 
 export default function LoginPage() {
   const { sendSignInEmail } = useAuth();
@@ -22,7 +22,7 @@ export default function LoginPage() {
   };
 
   return (
-    <OnlyUnAuthenticated>
+    <OnlyUnauthenticated>
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex items-center justify-center px-4">
         <div className="bg-white shadow-xl rounded-2xl p-8 max-w-md w-full border border-gray-200">
           <h1 className="text-4xl font-bold text-center text-gray-800 mb-4">🎨 Art Wise AI</h1>
@@ -57,6 +57,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </OnlyUnAuthenticated>
+    </OnlyUnauthenticated>
   );
 }

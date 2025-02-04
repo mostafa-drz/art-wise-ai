@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Output, VoiceGender } from '@/app/types';
 import { useGlobalState } from '@/app/context/GlobalState';
-
+import { handleChargeUser, GenAiType } from '@/app/utils';
+import { User } from '@/app/types';
 interface GenerateAudioButtonProps {
   context: Output;
+  user: User | null;
 }
 
-export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({ context }) => {
+export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({ context, user }) => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export const GenerateAudioButton: React.FC<GenerateAudioButtonProps> = ({ contex
       if (!response.ok) throw new Error('Failed to generate audio');
 
       const data = await response.json();
+      handleChargeUser(user as User, GenAiType.generateAudioVersion);
       setAudioUrl(data.audioUrl); // Set the audio URL returned by the server
     } catch (err: any) {
       setError(err.message || 'Something went wrong');

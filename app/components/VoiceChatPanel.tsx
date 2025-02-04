@@ -3,13 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, X } from 'lucide-react';
 import { RealtimeSession } from '../context/OpenAIRealtimeWebRTC/types';
+import { User } from '../types';
+import { handleChargeUser, GenAiType } from '../utils';
 
 interface VoiceChatPanelProps {
   onClose: () => void;
   session?: RealtimeSession | null;
+  user: User | null;
 }
 
-export default function VoiceChatPanel({ onClose, session }: VoiceChatPanelProps) {
+export default function VoiceChatPanel({ onClose, session, user }: VoiceChatPanelProps) {
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -28,6 +31,12 @@ export default function VoiceChatPanel({ onClose, session }: VoiceChatPanelProps
       audioRef.current.srcObject = remoteStream;
     }
   }, [session?.mediaStream]);
+
+  useEffect(() => {
+    if ((session?.tokenUsage?.totalTokens ?? 0) > 0) {
+      handleChargeUser(user as User, GenAiType.liveAudioConversation);
+    }
+  }, [session?.tokenUsage]);
 
   return (
     <div className="fixed bottom-20 right-6 bg-white shadow-xl rounded-xl p-4 w-80 border border-gray-200 z-50">

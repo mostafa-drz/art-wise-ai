@@ -1,0 +1,6 @@
+[
+  {
+    "path": "tailwind.config.ts",
+    "description": "Tailwind CSS configuration file, consider for theme and design system"
+  }
+]

@@ -27,8 +27,11 @@ export async function identifyArtwork({
     const data = await res.json();
     handleChargeUser(user, GenAiType.newSearch);
     return { data, error: null };
-  } catch (error: any) {
-    return { data: null, error: error.message || 'Something went wrong' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { data: null, error: error.message || 'Something went wrong' };
+    }
+    return { data: null, error: 'Something went wrong' };
   }
 }
 
@@ -56,8 +59,11 @@ export async function sendMessage({
     const data = await res.json();
     handleChargeUser(user, GenAiType.textConversation);
     return { data, error: null };
-  } catch (error: any) {
-    return { data: null, error: error.message || 'Something went wrong' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { data: null, error: error.message || 'Something went wrong' };
+    }
+    return { data: null, error: 'Something went wrong' };
   }
 }
 
@@ -68,7 +74,7 @@ export async function generateAudio({
   language,
 }: {
   user: User;
-  context: any;
+  context: Output | null;
   language: string;
 }) {
   try {
@@ -83,7 +89,10 @@ export async function generateAudio({
     const data = await res.json();
     handleChargeUser(user, GenAiType.generateAudioVersion);
     return { data, error: null };
-  } catch (error: any) {
-    return { data: null, error: error.message || 'Something went wrong' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { data: null, error: error.message || 'Something went wrong' };
+    }
+    return { data: null, error: 'Something went wrong' };
   }
 }

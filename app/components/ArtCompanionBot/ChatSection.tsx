@@ -6,7 +6,7 @@ import VoiceChatPanel from '../VoiceChatPanel';
 import FloatingActionButton from '../FloatingActionButton';
 import { ChatMode, Output } from '../../types';
 import { Content } from '@google-cloud/vertexai';
-
+import { RealtimeSession, ConnectionStatus } from '@/context/OpenAIRealtimeWebRTC/types';
 interface ChatSectionProps {
   data: Output;
   messages: Content[];
@@ -14,18 +14,16 @@ interface ChatSectionProps {
   isLoading: boolean;
   chatInputText: string;
   isFloatingButtonExpanded: boolean;
-  audioSession: any;
+  audioSession: RealtimeSession | null;
   onSendMessage: () => void;
   onInputTextChange: (text: string) => void;
   onOpenVoiceChat: () => void;
   onStartTextChat: () => void;
   onCloseVoiceChat: () => void;
-  onToggleMute: () => void;
   onToggleFloatingButton: () => void;
 }
 
 const ChatSection: React.FC<ChatSectionProps> = ({
-  data,
   messages,
   chatMode,
   isLoading,
@@ -37,7 +35,6 @@ const ChatSection: React.FC<ChatSectionProps> = ({
   onOpenVoiceChat,
   onStartTextChat,
   onCloseVoiceChat,
-  onToggleMute,
   onToggleFloatingButton,
 }) => {
   return (
@@ -55,11 +52,8 @@ const ChatSection: React.FC<ChatSectionProps> = ({
       {chatMode === ChatMode.VOICE && audioSession && (
         <VoiceChatPanel
           onClose={onCloseVoiceChat}
-          isMuted={audioSession?.isMuted || false}
-          onToggleMute={onToggleMute}
           mediaStream={audioSession.mediaStream || null}
-          isConnected={audioSession.isConnected || false}
-          isConnecting={audioSession.isConnecting || false}
+          connectionStatus={audioSession.connectionStatus || ConnectionStatus.DISCONNECTED}
         />
       )}
 

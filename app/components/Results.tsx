@@ -1,9 +1,7 @@
 import React from 'react';
 import { Output } from '../types';
 
-interface Props extends Output {}
-
-const Results: React.FC<Props> = ({
+const Results: React.FC<Output> = ({
   art_title,
   artist_name,
   date,

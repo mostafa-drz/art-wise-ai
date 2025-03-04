@@ -1,23 +1,18 @@
 'use client';
 
+import { ConnectionStatus } from '@/context/OpenAIRealtimeWebRTC/types';
 import React, { useEffect, useRef } from 'react';
 
 interface VoiceChatPanelProps {
-  isMuted: boolean;
-  onToggleMute: () => void;
   onClose: () => void;
   mediaStream: MediaStream | null;
-  isConnected: boolean;
-  isConnecting: boolean;
+  connectionStatus: ConnectionStatus;
 }
 
 const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
-  isMuted,
-  onToggleMute,
   onClose,
   mediaStream,
-  isConnected,
-  isConnecting,
+  connectionStatus,
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -41,20 +36,12 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
       </div>
 
       <div className="flex flex-col items-center space-y-4">
-        {isConnecting ? (
+        {connectionStatus === ConnectionStatus.CONNECTING ? (
           <div className="text-sm text-gray-500 animate-pulse">Connecting...</div>
-        ) : isConnected ? (
+        ) : connectionStatus === ConnectionStatus.CONNECTED ? (
           <>
-            <audio ref={audioRef} autoPlay muted={isMuted} />
+            <audio ref={audioRef} autoPlay />
             <div className="flex items-center space-x-4">
-              <button
-                onClick={onToggleMute}
-                className={`px-4 py-2 rounded-md text-white transition-transform transform hover:scale-105 ${
-                  isMuted ? 'bg-gray-400' : 'bg-indigo-500 hover:bg-indigo-600'
-                }`}
-              >
-                {isMuted ? 'Unmute' : 'Mute'}
-              </button>
               <button
                 onClick={onClose}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-transform transform hover:scale-105"

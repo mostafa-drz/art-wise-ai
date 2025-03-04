@@ -16,7 +16,6 @@ interface ResultsSectionProps {
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
   data,
-  user,
   audioUrl,
   isLoading,
   error,

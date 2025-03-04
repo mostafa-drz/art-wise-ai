@@ -9,7 +9,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { getServices } from '../utils/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, DocumentSnapshot } from 'firebase/firestore';
 import * as db from '../utils/db';
 import { User } from '../types';
 import { User as FireStoreUser } from 'firebase/auth';
@@ -58,9 +58,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem('emailForSignIn', email);
       alert('A sign-in link has been sent to your email.');
-    } catch (error: any) {
-      console.error('Error sending sign-in email:', error.message);
-      throw new Error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error sending sign-in email:', error.message);
+        throw new Error(error.message);
+      }
+      console.error('Error sending sign-in email:', error);
+      throw new Error('An unknown error occurred');
     }
   };
 
@@ -84,9 +88,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(result.user);
         window.localStorage.removeItem('emailForSignIn');
       }
-    } catch (error: any) {
-      console.error('Error signing in with email link:', error.message);
-      throw new Error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error signing in with email link:', error.message);
+        throw new Error(error.message);
+      }
+      console.error('Error signing in with email link:', error);
+      throw new Error('An unknown error occurred');
     }
   };
 
@@ -95,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const userId = user.uid;
     const usersCollection = db.getUsersCollection();
     const userDoc = doc(usersCollection, userId);
-    const unsubscribe = onSnapshot(userDoc, (doc: any) => {
+    const unsubscribe = onSnapshot(userDoc, (doc: DocumentSnapshot<User>) => {
       if (doc.exists()) {
         const userData = doc.data() as User;
         setUser((currentData) => ({ ...currentData, ...userData }));
@@ -112,9 +120,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signOut(auth);
       setUser(null);
-    } catch (error: any) {
-      console.error('Error signing out:', error.message);
-      throw new Error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error signing out:', error.message);
+        throw new Error(error.message);
+      }
+      console.error('Error signing out:', error);
+      throw new Error('An unknown error occurred');
     }
   };
 

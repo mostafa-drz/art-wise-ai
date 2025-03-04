@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Mic, MessageCircle, Plus, X } from 'lucide-react';
 
 interface FloatingActionButtonProps {

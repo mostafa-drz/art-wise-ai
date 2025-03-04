@@ -18,6 +18,7 @@ import {
   TurnDetectionType,
   SessionConfig as VoiceSessionConfig,
   Modality as VoiceSessionModality,
+  ConnectionStatus,
 } from '@/context/OpenAIRealtimeWebRTC/types';
 
 // Utils & API
@@ -83,7 +84,7 @@ export default function Home() {
 
     setChatMode(ChatMode.VOICE);
 
-    if (!audioSession?.isConnected) {
+    if (audioSession?.connectionStatus === ConnectionStatus.CONNECTED) {
       const voiceSessionConfig: VoiceSessionConfig = {
         modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
         input_audio_transcription: {
@@ -99,7 +100,7 @@ export default function Home() {
         },
       };
       const newVoiceSession = await createNewVoiceChatSession(voiceSessionConfig);
-      liveVoiceSession.startSession(newVoiceSession);
+      liveVoiceSession.connect(newVoiceSession);
     }
   }
 
@@ -119,8 +120,12 @@ export default function Home() {
 
       handleChargeUser(user as User, GenAiType.generateAudioVersion);
       setAudioUrl(responseData.audioUrl); // Set the audio URL returned by the server
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Something went wrong');
+      } else {
+        setError('Something went wrong');
+      }
     } finally {
       setGenerateAudioLoading(false);
     }
@@ -130,12 +135,36 @@ export default function Home() {
     return redirect('/not-enough-credits');
   }
 
+  if (loading) {
+    return (
+      <LoadingIndicator isLoading={loading}>
+        <div className="flex flex-col items-center">
+          <HeaderSection />
+          <UploadSection
+            user={user}
+            onSuccess={setData}
+            onError={setError}
+            onLoading={setLoading}
+            loading={loading}
+          />
+          {error && <div className="text-red-500">{error}</div>}
+        </div>
+      </LoadingIndicator>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="flex flex-col items-center">
         <HeaderSection />
-        <UploadSection user={user} onSuccess={setData} onError={setError} />
-
+        <UploadSection
+          user={user}
+          onSuccess={setData}
+          onError={setError}
+          onLoading={setLoading}
+          loading={loading}
+        />
+        {error && <div className="text-red-500">{error}</div>}
         <LoadingIndicator isLoading={loading}>
           {data && (
             <>
@@ -160,13 +189,8 @@ export default function Home() {
                 onOpenVoiceChat={handleOpenVoiceChat}
                 onStartTextChat={() => setChatMode(ChatMode.TEXT)}
                 onCloseVoiceChat={() => {
-                  liveVoiceSession.closeSession();
+                  liveVoiceSession.disconnect();
                   setChatMode(null);
-                }}
-                onToggleMute={() => {
-                  audioSession?.isMuted
-                    ? liveVoiceSession.unmuteSessionAudio()
-                    : liveVoiceSession.muteSessionAudio();
                 }}
                 onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
               />

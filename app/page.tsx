@@ -36,6 +36,8 @@ import ChatSection from '@/components/ArtCompanionBot/ChatSection';
 
 // Realtime Utilities
 import { createNewVoiceChatSession } from '@/context/OpenAIRealtimeWebRTC/utils';
+import * as Sentry from '@sentry/nextjs';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function Home() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -83,25 +85,39 @@ export default function Home() {
   async function handleOpenVoiceChat() {
     if (!data) return;
 
-    setChatMode(ChatMode.VOICE);
+    let voiceSessionConfig: VoiceSessionConfig | null = null;
 
-    if (!audioSession || audioSession.connectionStatus !== ConnectionStatus.CONNECTED) {
-      const voiceSessionConfig: VoiceSessionConfig = {
-        modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
-        input_audio_transcription: {
-          model: 'whisper-1',
+    try {
+      setChatMode(ChatMode.VOICE);
+
+      if (!audioSession || audioSession.connectionStatus !== ConnectionStatus.CONNECTED) {
+        voiceSessionConfig = {
+          modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
+          input_audio_transcription: {
+            model: 'whisper-1',
+          },
+          instructions: `
+          You are an art historian. Provide detailed insights about the artwork with following JSON data ${JSON.stringify(data)}.
+        `,
+          turn_detection: {
+            type: TurnDetectionType.SERVER_VAD,
+            threshold: 0.8,
+            silence_duration_ms: 1000,
+          },
+        };
+        const newVoiceSession = await createNewVoiceChatSession(voiceSessionConfig);
+        await liveVoiceSession.connect(newVoiceSession);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start voice chat';
+      Sentry.captureException(error, {
+        tags: { component: 'VoiceChat' },
+        extra: {
+          userId: user.uid,
+          sessionConfig: voiceSessionConfig || 'Not configured',
         },
-        instructions: `
-        You are an art historian. Provide detailed insights about the artwork with following JSON data ${JSON.stringify(data)}.
-      `,
-        turn_detection: {
-          type: TurnDetectionType.SERVER_VAD,
-          threshold: 0.8,
-          silence_duration_ms: 1000,
-        },
-      };
-      const newVoiceSession = await createNewVoiceChatSession(voiceSessionConfig);
-      liveVoiceSession.connect(newVoiceSession);
+      });
+      setError(errorMessage);
     }
   }
 
@@ -171,6 +187,15 @@ export default function Home() {
     };
   }, [user, liveVoiceSession]);
 
+  // Critical error handling for authentication
+  useEffect(() => {
+    if (!auth.user && !auth.loading) {
+      Sentry.captureMessage('Unauthenticated access attempt', {
+        level: 'warning',
+      });
+    }
+  }, [auth.user, auth.loading]);
+
   if (user && user.availableCredits && user.availableCredits < 0) {
     return redirect('/not-enough-credits');
   }
@@ -194,49 +219,51 @@ export default function Home() {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="flex flex-col items-center">
-        <HeaderSection />
-        <UploadSection
-          user={user}
-          onSuccess={setData}
-          onError={setError}
-          onLoading={setLoading}
-          loading={loading}
-        />
-        {error && <div className="text-red-500">{error}</div>}
-        <LoadingIndicator isLoading={loading}>
-          {data && (
-            <>
-              <ResultsSection
-                data={data}
-                user={user}
-                audioUrl={audioUrl}
-                isLoading={generateAudioLoading}
-                error={generateAudioError}
-                onGenerateAudio={generateAudio}
-              />
-              <ChatSection
-                messages={messages}
-                chatMode={chatMode}
-                isLoading={chatLoading}
-                chatInputText={chatInputText}
-                isFloatingButtonExpanded={isFloatingButtonExpanded}
-                audioSession={audioSession}
-                onSendMessage={handleSendMessage}
-                onInputTextChange={setChatInputText}
-                onOpenVoiceChat={handleOpenVoiceChat}
-                onStartTextChat={() => setChatMode(ChatMode.TEXT)}
-                onCloseVoiceChat={handleCloseVoiceChat}
-                onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
-                setChatMode={setChatMode}
-                onCommitAudio={handleCommitAudio}
-                onAudioChunk={handleAudioChunk}
-              />
-            </>
-          )}
-        </LoadingIndicator>
-      </div>
-    </ProtectedRoute>
+    <ErrorBoundary>
+      <ProtectedRoute>
+        <div className="flex flex-col items-center">
+          <HeaderSection />
+          <UploadSection
+            user={user}
+            onSuccess={setData}
+            onError={setError}
+            onLoading={setLoading}
+            loading={loading}
+          />
+          {error && <div className="text-red-500">{error}</div>}
+          <LoadingIndicator isLoading={loading}>
+            {data && (
+              <>
+                <ResultsSection
+                  data={data}
+                  user={user}
+                  audioUrl={audioUrl}
+                  isLoading={generateAudioLoading}
+                  error={generateAudioError}
+                  onGenerateAudio={generateAudio}
+                />
+                <ChatSection
+                  messages={messages}
+                  chatMode={chatMode}
+                  isLoading={chatLoading}
+                  chatInputText={chatInputText}
+                  isFloatingButtonExpanded={isFloatingButtonExpanded}
+                  audioSession={audioSession}
+                  onSendMessage={handleSendMessage}
+                  onInputTextChange={setChatInputText}
+                  onOpenVoiceChat={handleOpenVoiceChat}
+                  onStartTextChat={() => setChatMode(ChatMode.TEXT)}
+                  onCloseVoiceChat={handleCloseVoiceChat}
+                  onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
+                  setChatMode={setChatMode}
+                  onCommitAudio={handleCommitAudio}
+                  onAudioChunk={handleAudioChunk}
+                />
+              </>
+            )}
+          </LoadingIndicator>
+        </div>
+      </ProtectedRoute>
+    </ErrorBoundary>
   );
 }

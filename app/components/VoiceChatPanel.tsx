@@ -22,7 +22,7 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
   onCommitAudio,
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [chatMode, setChatMode] = useState<ChatMode>('live');
+  const [chatMode, setChatMode] = useState<ChatMode>('push-to-talk');
 
   useEffect(() => {
     if (audioRef.current && mediaStream) {
@@ -48,106 +48,132 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-white shadow-lg rounded-xl border border-gray-200 p-4 w-80 animate-fade-in transition-all duration-300 hover:shadow-xl">
-      <div className="flex items-center justify-between mb-4">
+    <div className="fixed bottom-4 right-4 z-50 bg-white rounded-lg shadow-lg border border-gray-200 w-[400px] animate-fade-in">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center space-x-2">
-          <h2 className="text-lg font-semibold text-gray-800">Voice Chat</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Voice Assistant</h2>
           {connectionStatus === ConnectionStatus.CONNECTED && (
-            <span className="flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              Active
             </span>
           )}
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-red-500 transition-colors duration-200"
-          title="End Call"
+          className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+          aria-label="Close voice chat"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
+              fillRule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clipRule="evenodd"
             />
           </svg>
         </button>
       </div>
 
-      {/* Mode Selection */}
-      <div className="flex flex-col items-center space-y-2 mb-4">
-        <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
-          <button
-            onClick={() => handleModeChange('live')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
-              ${
-                chatMode === 'live'
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-gray-500 hover:text-primary'
-              }`}
-          >
-            Live Chat
-          </button>
-          <button
-            onClick={() => handleModeChange('push-to-talk')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
-              ${
-                chatMode === 'push-to-talk'
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-gray-500 hover:text-primary'
-              }`}
-          >
-            Push to Talk
-          </button>
+      <div className="p-6">
+        {/* Welcome Message when not connected */}
+        {connectionStatus === ConnectionStatus.DISCONNECTED && (
+          <div className="flex flex-col items-center justify-center space-y-4 text-center px-4 py-6">
+            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Voice Interaction Ready</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Choose your preferred mode to start the conversation
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Mode Selection with improved styling */}
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-full p-1 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="grid grid-cols-2 gap-1">
+              <button
+                onClick={() => handleModeChange('live')}
+                className={`px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200
+                  ${
+                    chatMode === 'live'
+                      ? 'bg-white text-blue-600 shadow-sm border border-gray-200'
+                      : 'text-gray-500 hover:text-blue-600'
+                  }`}
+              >
+                Live Chat
+              </button>
+              <button
+                onClick={() => handleModeChange('push-to-talk')}
+                className={`px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200
+                  ${
+                    chatMode === 'push-to-talk'
+                      ? 'bg-white text-blue-600 shadow-sm border border-gray-200'
+                      : 'text-gray-500 hover:text-blue-600'
+                  }`}
+              >
+                Push to Talk
+              </button>
+            </div>
+          </div>
+
+          {/* Mode description */}
+          <div className="text-center px-4">
+            <p className="text-sm text-gray-600 font-medium mb-1">
+              {chatMode === 'live' ? 'Live Chat Mode' : 'Push to Talk Mode'}
+            </p>
+            <p className="text-xs text-gray-500">
+              {chatMode === 'live'
+                ? 'Perfect for quiet environments. Speak naturally for a continuous conversation.'
+                : 'Ideal for noisy places. Hold the button while speaking, release when done.'}
+            </p>
+          </div>
         </div>
-        <p className="text-xs text-gray-500 text-center px-2">
-          {chatMode === 'live'
-            ? 'Speak naturally in a quiet environment for continuous conversation'
-            : 'Perfect for noisy places - hold to speak, release when done'}
-        </p>
-      </div>
 
-      <div className="flex flex-col items-center space-y-4">
-        {/* Hidden audio element for live chat */}
-        <audio ref={audioRef} autoPlay playsInline />
+        {/* Connection States */}
+        <div className="mt-6">
+          <audio ref={audioRef} autoPlay playsInline className="hidden" />
 
-        <div className="w-full">
           {connectionStatus === ConnectionStatus.CONNECTING ? (
-            <div className="flex items-center justify-center space-x-2 py-2">
-              <div className="animate-pulse text-sm text-gray-500">Connecting</div>
-              <div className="flex space-x-1">
-                <div className="w-1 h-1 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                <div className="w-1 h-1 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                <div className="w-1 h-1 bg-gray-500 rounded-full animate-bounce"></div>
+            <div className="flex flex-col items-center space-y-3 py-4">
+              <div className="flex items-center space-x-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                <span className="text-sm text-gray-600">Connecting...</span>
               </div>
+              <p className="text-xs text-gray-500">Setting up your voice connection</p>
             </div>
           ) : connectionStatus === ConnectionStatus.CONNECTED ? (
             <div className="flex flex-col items-center space-y-4">
               {chatMode === 'push-to-talk' ? (
                 <PushToTalk onRecording={onAudioChunk} onRecordingStopped={onCommitAudio} />
               ) : (
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  <span>Live chat active</span>
+                  <span className="text-sm text-gray-600">Listening...</span>
                 </div>
               )}
+
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
               >
-                End Call
+                End Conversation
               </button>
             </div>
-          ) : (
-            <div className="text-sm text-gray-500 text-center">Not Connected</div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

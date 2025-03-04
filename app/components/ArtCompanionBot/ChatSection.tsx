@@ -22,6 +22,8 @@ interface ChatSectionProps {
   onCloseVoiceChat: () => void;
   onToggleFloatingButton: () => void;
   setChatMode: (mode: ChatMode | null) => void;
+  onCommitAudio: () => void;
+  onAudioChunk: (base64Audio: string) => void;
 }
 
 const ChatSection: React.FC<ChatSectionProps> = ({
@@ -38,6 +40,8 @@ const ChatSection: React.FC<ChatSectionProps> = ({
   onCloseVoiceChat,
   onToggleFloatingButton,
   setChatMode,
+  onCommitAudio,
+  onAudioChunk,
 }) => {
   return (
     <>
@@ -57,6 +61,8 @@ const ChatSection: React.FC<ChatSectionProps> = ({
           onClose={onCloseVoiceChat}
           mediaStream={audioSession.mediaStream || null}
           connectionStatus={audioSession.connectionStatus || ConnectionStatus.DISCONNECTED}
+          onAudioChunk={onAudioChunk}
+          onCommitAudio={onCommitAudio}
         />
       )}
 

@@ -1,20 +1,28 @@
 'use client';
 
 import { ConnectionStatus } from '@/context/OpenAIRealtimeWebRTC/types';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import PushToTalk from './PushToTalk';
 
 interface VoiceChatPanelProps {
   onClose: () => void;
   mediaStream: MediaStream | null;
   connectionStatus: ConnectionStatus;
+  onAudioChunk: (base64Audio: string) => void;
+  onCommitAudio: () => void;
 }
+
+type ChatMode = 'live' | 'push-to-talk';
 
 const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
   onClose,
   mediaStream,
   connectionStatus,
+  onAudioChunk,
+  onCommitAudio,
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [chatMode, setChatMode] = useState<ChatMode>('live');
 
   useEffect(() => {
     if (audioRef.current && mediaStream) {
@@ -34,6 +42,10 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
       });
     }
   }, [mediaStream]);
+
+  const handleModeChange = (mode: ChatMode) => {
+    setChatMode(mode);
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50 bg-white shadow-lg rounded-xl border border-gray-200 p-4 w-80 animate-fade-in transition-all duration-300 hover:shadow-xl">
@@ -69,8 +81,36 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
         </button>
       </div>
 
+      {/* Mode Selection */}
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+          <button
+            onClick={() => handleModeChange('live')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
+              ${
+                chatMode === 'live'
+                  ? 'bg-white text-primary shadow-sm'
+                  : 'text-gray-500 hover:text-primary'
+              }`}
+          >
+            Live Chat
+          </button>
+          <button
+            onClick={() => handleModeChange('push-to-talk')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
+              ${
+                chatMode === 'push-to-talk'
+                  ? 'bg-white text-primary shadow-sm'
+                  : 'text-gray-500 hover:text-primary'
+              }`}
+          >
+            Push to Talk
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-col items-center space-y-4">
-        {/* Hidden audio element */}
+        {/* Hidden audio element for live chat */}
         <audio ref={audioRef} autoPlay playsInline />
 
         <div className="w-full">
@@ -84,7 +124,15 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
               </div>
             </div>
           ) : connectionStatus === ConnectionStatus.CONNECTED ? (
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center space-y-4">
+              {chatMode === 'push-to-talk' && onAudioChunk && onCommitAudio ? (
+                <PushToTalk onRecording={onAudioChunk} onRecordingStopped={onCommitAudio} />
+              ) : (
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span>Live chat active</span>
+                </div>
+              )}
               <button
                 onClick={onClose}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"

@@ -193,6 +193,8 @@ export default function Home() {
                 }}
                 onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
                 setChatMode={setChatMode}
+                onCommitAudio={() => liveVoiceSession.commitAudioBuffer()}
+                onAudioChunk={(base64Audio: string) => liveVoiceSession.sendAudioChunk(base64Audio)}
               />
             </>
           )}

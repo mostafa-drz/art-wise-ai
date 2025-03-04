@@ -2,6 +2,8 @@ import { updateUser } from './db';
 import { User } from '../types';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getServices } from './firebase';
+import { Timestamp } from 'firebase/firestore';
+import { serverTimestamp } from 'firebase/firestore';
 
 export async function uploadImageToFirebase(userId: string, sessionId: string, image: File) {
   const services = getServices();
@@ -89,7 +91,7 @@ export async function handleChargeUser(user: User, transactionType: GenAiType): 
     await updateUser(user.uid, {
       availableCredits: newAvailableCredits,
       usedCredits: newUsedCredits,
-      lastTransactionAt: new Date().toISOString(),
+      lastTransactionAt: serverTimestamp() as Timestamp,
     });
 
     // Alert if credits are running low

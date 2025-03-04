@@ -863,7 +863,6 @@ export interface RealtimeSession {
      */
     expires_at: number;
   };
-
   /**
    * The WebRTC peer connection associated with this session.
    * Used for managing the connection lifecycle.
@@ -886,11 +885,14 @@ export interface RealtimeSession {
    * Each transcript includes details such as content, timestamp, type, and role.
    */
   transcripts: Transcript[];
-
   /**
    * Tracks token usage statistics for the session.
    */
   tokenUsage?: TokenUsage;
+  /**
+   * Indicates whether the session audio is muted.
+   */
+  isMuted?: boolean;
 
   /**
    * ISO 8601 timestamp when the session was started
@@ -1189,7 +1191,7 @@ export interface OpenAIRealtimeContextConfig {
   /**
    * Default audio settings to be used across all sessions
    */
-  defaultAudioSettings?: AudioSettings;
+  defaultAudioSettings?: AudioSettings | null;
 
   /**
    * Logger instance for logging session events
@@ -1234,3 +1236,5 @@ export interface Logger {
   warn(message: string, meta?: { [key: string]: unknown }): void;
   error(message: string, meta?: { [key: string]: unknown }): void;
 }
+
+export type EventCallback = (event: RealtimeEvent) => void;

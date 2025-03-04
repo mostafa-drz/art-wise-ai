@@ -1,7 +1,7 @@
 'use client';
 
 // React & Next.js Core
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { redirect } from 'next/navigation';
 
 // Third-Party Libraries
@@ -19,6 +19,7 @@ import {
   SessionConfig as VoiceSessionConfig,
   Modality as VoiceSessionModality,
   ConnectionStatus,
+  RealtimeEventType,
 } from '@/context/OpenAIRealtimeWebRTC/types';
 
 // Utils & API
@@ -157,6 +158,18 @@ export default function Home() {
       setGenerateAudioLoading(false);
     }
   }
+
+  useEffect(() => {
+    function chargeRealtimeInteractions() {
+      handleChargeUser(user, GenAiType.liveAudioConversation);
+    }
+
+    liveVoiceSession.on(RealtimeEventType.RESPONSE_DONE, chargeRealtimeInteractions);
+
+    return () => {
+      liveVoiceSession.off(RealtimeEventType.RESPONSE_DONE, chargeRealtimeInteractions);
+    };
+  }, [user, liveVoiceSession]);
 
   if (user && user.availableCredits && user.availableCredits < 0) {
     return redirect('/not-enough-credits');

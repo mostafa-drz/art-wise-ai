@@ -82,7 +82,7 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
       </div>
 
       {/* Mode Selection */}
-      <div className="flex justify-center mb-4">
+      <div className="flex flex-col items-center space-y-2 mb-4">
         <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
           <button
             onClick={() => handleModeChange('live')}
@@ -107,6 +107,11 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
             Push to Talk
           </button>
         </div>
+        <p className="text-xs text-gray-500 text-center px-2">
+          {chatMode === 'live'
+            ? 'Speak naturally in a quiet environment for continuous conversation'
+            : 'Perfect for noisy places - hold to speak, release when done'}
+        </p>
       </div>
 
       <div className="flex flex-col items-center space-y-4">
@@ -125,7 +130,7 @@ const VoiceChatPanel: React.FC<VoiceChatPanelProps> = ({
             </div>
           ) : connectionStatus === ConnectionStatus.CONNECTED ? (
             <div className="flex flex-col items-center space-y-4">
-              {chatMode === 'push-to-talk' && onAudioChunk && onCommitAudio ? (
+              {chatMode === 'push-to-talk' ? (
                 <PushToTalk onRecording={onAudioChunk} onRecordingStopped={onCommitAudio} />
               ) : (
                 <div className="flex items-center space-x-2 text-sm text-gray-600">

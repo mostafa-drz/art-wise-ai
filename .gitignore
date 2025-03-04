@@ -40,3 +40,5 @@ firebase-admin-service-account.json
 public/temp/
 
 .next-ai-task.txt
+# Sentry Config File
+.env.sentry-build-plugin

@@ -202,66 +202,113 @@ export default function Home() {
 
   if (loading) {
     return (
-      <LoadingIndicator isLoading={loading}>
-        <div className="flex flex-col items-center">
-          <HeaderSection />
-          <UploadSection
-            user={user}
-            onSuccess={setData}
-            onError={setError}
-            onLoading={setLoading}
-            loading={loading}
-          />
-          {error && <div className="text-red-500">{error}</div>}
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <LoadingIndicator isLoading={loading}>
+            <div className="space-y-8">
+              <HeaderSection />
+              <UploadSection
+                user={user}
+                onSuccess={setData}
+                onError={setError}
+                onLoading={setLoading}
+                loading={loading}
+              />
+              {error && (
+                <div className="rounded-lg bg-red-50 p-4">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+            </div>
+          </LoadingIndicator>
         </div>
-      </LoadingIndicator>
+      </div>
     );
   }
 
   return (
     <ErrorBoundary>
       <ProtectedRoute>
-        <div className="flex flex-col items-center">
-          <HeaderSection />
-          <UploadSection
-            user={user}
-            onSuccess={setData}
-            onError={setError}
-            onLoading={setLoading}
-            loading={loading}
-          />
-          {error && <div className="text-red-500">{error}</div>}
-          <LoadingIndicator isLoading={loading}>
-            {data && (
-              <>
-                <ResultsSection
-                  data={data}
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="space-y-8">
+              {/* Welcome Section */}
+              <div className="text-center">
+                <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                  Welcome to Your Art Companion
+                </h1>
+                <p className="mt-3 text-xl text-gray-500">
+                  Upload an artwork to start your interactive experience
+                </p>
+              </div>
+
+              {/* Upload Section */}
+              <div className="bg-white rounded-2xl shadow-sm p-8">
+                <UploadSection
                   user={user}
-                  audioUrl={audioUrl}
-                  isLoading={generateAudioLoading}
-                  error={generateAudioError}
-                  onGenerateAudio={generateAudio}
+                  onSuccess={setData}
+                  onError={setError}
+                  onLoading={setLoading}
+                  loading={loading}
                 />
-                <ChatSection
-                  messages={messages}
-                  chatMode={chatMode}
-                  isLoading={chatLoading}
-                  chatInputText={chatInputText}
-                  isFloatingButtonExpanded={isFloatingButtonExpanded}
-                  audioSession={audioSession}
-                  onSendMessage={handleSendMessage}
-                  onInputTextChange={setChatInputText}
-                  onOpenVoiceChat={handleOpenVoiceChat}
-                  onStartTextChat={() => setChatMode(ChatMode.TEXT)}
-                  onCloseVoiceChat={handleCloseVoiceChat}
-                  onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
-                  setChatMode={setChatMode}
-                  onCommitAudio={handleCommitAudio}
-                  onAudioChunk={handleAudioChunk}
-                />
-              </>
-            )}
-          </LoadingIndicator>
+                {error && (
+                  <div className="mt-4 rounded-lg bg-red-50 p-4">
+                    <p className="text-sm text-red-700">{error}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Results and Chat Sections */}
+              <LoadingIndicator isLoading={loading}>
+                {data && (
+                  <div className="space-y-8">
+                    {/* Results Section */}
+                    <div className="bg-white rounded-2xl shadow-sm p-8">
+                      <ResultsSection
+                        data={data}
+                        user={user}
+                        audioUrl={audioUrl}
+                        isLoading={generateAudioLoading}
+                        error={generateAudioError}
+                        onGenerateAudio={generateAudio}
+                      />
+                    </div>
+
+                    {/* Chat Section */}
+                    <div className="bg-white rounded-2xl shadow-sm">
+                      <ChatSection
+                        messages={messages}
+                        chatMode={chatMode}
+                        isLoading={chatLoading}
+                        chatInputText={chatInputText}
+                        isFloatingButtonExpanded={isFloatingButtonExpanded}
+                        audioSession={audioSession}
+                        onSendMessage={handleSendMessage}
+                        onInputTextChange={setChatInputText}
+                        onOpenVoiceChat={handleOpenVoiceChat}
+                        onStartTextChat={() => setChatMode(ChatMode.TEXT)}
+                        onCloseVoiceChat={handleCloseVoiceChat}
+                        onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
+                        setChatMode={setChatMode}
+                        onCommitAudio={handleCommitAudio}
+                        onAudioChunk={handleAudioChunk}
+                      />
+                    </div>
+                  </div>
+                )}
+              </LoadingIndicator>
+
+              {/* Credits Status */}
+              {user && (
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">
+                    Available Credits:{' '}
+                    <span className="font-medium text-blue-600">{user.availableCredits}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </ProtectedRoute>
     </ErrorBoundary>

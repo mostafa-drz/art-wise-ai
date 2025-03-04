@@ -141,18 +141,20 @@ const UploadSection: React.FC<UploadSectionProps> = ({
             <div className="mt-4">
               <p className="text-sm text-gray-600">
                 {isDragActive ? (
-                  'Drop your artwork here...'
+                  'Ready to explore this artwork...'
                 ) : (
                   <>
-                    <span className="hidden md:inline">Drag and drop your artwork, or </span>
+                    <span className="hidden md:inline">Drop your artwork here, or </span>
                     <span className="text-blue-600 hover:text-blue-700">
-                      {window.innerWidth <= 768 ? 'Take a photo or choose image' : 'browse files'}
+                      {window.innerWidth <= 768
+                        ? 'Take a photo or select artwork'
+                        : 'browse artworks'}
                     </span>
                   </>
                 )}
               </p>
               <p className="mt-2 text-xs text-gray-500">
-                Take a photo or upload PNG, JPG, GIF (max 5MB)
+                Capture or upload any artwork - paintings, sculptures, or installations (max 5MB)
               </p>
             </div>
           </div>
@@ -162,7 +164,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-              <p className="mt-2 text-sm text-gray-600">Analyzing artwork...</p>
+              <p className="mt-2 text-sm text-gray-600">Discovering artwork details...</p>
             </div>
           </div>
         )}

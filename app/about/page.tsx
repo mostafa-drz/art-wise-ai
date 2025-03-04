@@ -1,4 +1,12 @@
-'use client';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Art Wise AI - Making Art Understanding Accessible',
+  description:
+    'Art Wise AI makes art appreciation accessible through AI-powered conversations. Discover the stories, techniques, and cultural significance behind any artwork.',
+  keywords:
+    'art analysis, AI art guide, art history, art appreciation, artwork analysis, art education, art technology',
+};
 
 export default function AboutPage() {
   return (
@@ -7,10 +15,10 @@ export default function AboutPage() {
         {/* Mission Statement */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-            Making Art More Accessible
+            Making Art Understanding Accessible
           </h1>
           <p className="mt-4 text-xl text-gray-500">
-            Bridging the gap between art appreciation and artificial intelligence
+            Discover the stories and meanings behind every artwork through AI-powered conversations
           </p>
         </div>
 
@@ -18,11 +26,14 @@ export default function AboutPage() {
         <div className="space-y-16">
           {/* What We Do Section */}
           <section className="bg-white rounded-2xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">What We Do</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Story</h2>
             <p className="text-gray-600 leading-relaxed">
-              Art Wise AI is an innovative platform that combines artificial intelligence with art
-              appreciation. We provide instant, in-depth analysis of artworks through both text and
-              voice interactions, making art more accessible and engaging for everyone.
+              Art is more than what meets the eye - each piece carries rich stories, historical
+              significance, and cultural meaning. Born from our passion for art and technology, Art
+              Wise AI bridges the gap between viewing art and truly understanding it. We believe
+              everyone should have the opportunity to uncover the fascinating details, techniques,
+              and context behind any artwork they encounter, making art appreciation more accessible
+              and engaging for all.
             </p>
           </section>
 
@@ -44,9 +55,10 @@ export default function AboutPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Smart Art Analysis</h3>
               <p className="text-gray-600">
-                Advanced machine learning algorithms provide detailed insights about artworks.
+                Simply capture or upload any artwork to instantly uncover its unique story, artistic
+                elements, and historical context.
               </p>
             </div>
 
@@ -66,9 +78,10 @@ export default function AboutPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Voice Interaction</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Interactive Experience</h3>
               <p className="text-gray-600">
-                Natural voice conversations with our AI art historian for an immersive experience.
+                Engage in natural conversations through text or voice chat to explore artworks in
+                depth, just like discussing with an art expert.
               </p>
             </div>
 
@@ -88,24 +101,25 @@ export default function AboutPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Multi-language</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Comprehensive Insights</h3>
               <p className="text-gray-600">
-                Audio descriptions and interactions available in multiple languages.
+                Discover artistic techniques, historical influences, and cultural significance that
+                make each artwork unique and meaningful.
               </p>
             </div>
           </section>
 
           {/* Contact Section */}
           <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-sm p-8 text-white">
-            <h2 className="text-2xl font-bold mb-4">Get in Touch</h2>
+            <h2 className="text-2xl font-bold mb-4">Be Part of Art&apos;s Future</h2>
             <p className="text-blue-100 mb-6">
-              Have questions or feedback? We&apos;d love to hear from you.
+              Share your thoughts and help us enhance the way people connect with art worldwide.
             </p>
             <a
               href="mailto:contact@artwiseai.com"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors"
             >
-              Contact Us
+              Get in Touch
               <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"

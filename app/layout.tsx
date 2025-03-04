@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { GlobalStateProvider } from './context/GlobalState';
-import { OpenAIRealtimeWebRTCProvider } from './context/OpenAIRealtimeWebRTC';
 import { AuthProvider } from './context/Auth';
 import Header from './components/Header';
+import Providers from './components/Providers';
 
 export const metadata: Metadata = {
   title: 'Art Wise AI',
@@ -20,12 +20,12 @@ export default function RootLayout({
       <body className="bg-purple-50">
         <AuthProvider>
           <GlobalStateProvider>
-            <OpenAIRealtimeWebRTCProvider>
+            <Providers>
               <main className="min-h-screen w-screen">
                 <Header />
                 <div className="container mx-auto px-4 py-10">{children}</div>
               </main>
-            </OpenAIRealtimeWebRTCProvider>
+            </Providers>
           </GlobalStateProvider>
         </AuthProvider>
       </body>

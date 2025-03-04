@@ -193,7 +193,7 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<OpenAIRealtimeWebRTCProvider
   children,
 }) => {
   const [session, dispatch] = useReducer(sessionReducer, null);
-
+  console.log('config', config);
   const logger = config?.logger || createNoopLogger();
 
   useEffect(() => {
@@ -225,7 +225,7 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<OpenAIRealtimeWebRTCProvider
 
       // Use config audio settings if provided
       const audioSettings = realtimeSession.audioSettings ||
-        config.defaultAudioSettings || {
+        config?.defaultAudioSettings || {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
@@ -333,7 +333,7 @@ export const OpenAIRealtimeWebRTCProvider: React.FC<OpenAIRealtimeWebRTCProvider
       };
 
       // Set ICE timeout from config
-      const iceTimeout = config.defaultIceTimeout || 30000;
+      const iceTimeout = config?.defaultIceTimeout || 30000;
       iceTimeoutId = setTimeout(() => {
         if (pc.iceConnectionState !== 'connected') {
           logger.error(`ICE connection timeout for session '${sessionId}'`);

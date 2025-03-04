@@ -84,7 +84,7 @@ export default function Home() {
 
     setChatMode(ChatMode.VOICE);
 
-    if (audioSession?.connectionStatus === ConnectionStatus.CONNECTED) {
+    if (!audioSession || audioSession.connectionStatus !== ConnectionStatus.CONNECTED) {
       const voiceSessionConfig: VoiceSessionConfig = {
         modalities: [VoiceSessionModality.AUDIO, VoiceSessionModality.TEXT],
         input_audio_transcription: {

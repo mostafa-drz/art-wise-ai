@@ -4,11 +4,11 @@ import React from 'react';
 import TextChat from '../TextChat';
 import VoiceChatPanel from '../VoiceChatPanel';
 import FloatingActionButton from '../FloatingActionButton';
-import { ChatMode, Output } from '../../types';
+import { ChatMode } from '../../types';
 import { Content } from '@google-cloud/vertexai';
 import { RealtimeSession, ConnectionStatus } from '@/context/OpenAIRealtimeWebRTC/types';
+
 interface ChatSectionProps {
-  data: Output;
   messages: Content[];
   chatMode: ChatMode | null;
   isLoading: boolean;
@@ -57,12 +57,14 @@ const ChatSection: React.FC<ChatSectionProps> = ({
         />
       )}
 
-      <FloatingActionButton
-        onStartVoiceChat={onOpenVoiceChat}
-        onStartTextChat={onStartTextChat}
-        isExpanded={isFloatingButtonExpanded}
-        onToggleExpand={onToggleFloatingButton}
-      />
+      {!chatMode && (
+        <FloatingActionButton
+          onStartVoiceChat={onOpenVoiceChat}
+          onStartTextChat={onStartTextChat}
+          isExpanded={isFloatingButtonExpanded}
+          onToggleExpand={onToggleFloatingButton}
+        />
+      )}
     </>
   );
 };

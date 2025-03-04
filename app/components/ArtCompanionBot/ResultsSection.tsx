@@ -23,7 +23,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <div className="sticky top-4 z-10 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm p-4">
+      <div className="bg-white rounded-lg p-4 flex justify-center items-center">
         <GenerateAudioButton
           onGenerateAudio={onGenerateAudio}
           audioUrl={audioUrl}

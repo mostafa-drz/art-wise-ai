@@ -1,5 +1,6 @@
 import { RealtimeSession } from './context/OpenAIRealtimeWebRTC/types';
-import { User as FireStoreUser } from 'firebase/auth';
+import { User as FirebaseUser } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
 export interface Input {
   language?: string; // optional field, it mentions the default language for response and further inputs, if not provided en-US, the language is in standard formats
 }
@@ -47,9 +48,17 @@ export enum ChatMode {
   TEXT = 'text',
 }
 
-export interface User extends FireStoreUser {
+// Base interface for user data stored in Firestore
+export interface UserData {
   availableCredits: number;
   usedCredits: number;
   sessions?: RealtimeSession[];
   isBlocked?: boolean;
+  lastTransactionAt?: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  lastLoginAt?: Timestamp;
 }
+
+// Combined interface for both Firebase Auth and our custom fields
+export interface User extends FirebaseUser, UserData {}

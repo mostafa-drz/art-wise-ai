@@ -31,21 +31,75 @@ export enum GenAiType {
   liveAudioConversation = 'liveAudioConversation',
 }
 
-export const FREE_INCLUDED_CREDITS_FOR_USER = 1000;
+// Constants for credit system
+export const FREE_INCLUDED_CREDITS = 1000;
+export const MAX_CREDITS_PER_DAY = 500;
+export const MIN_CREDITS_ALERT = 100;
 export const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+// Cost per operation
 export const GEN_AI_COST = {
   [GenAiType.newSearch]: 1,
   [GenAiType.generateAudioVersion]: 2,
-  // Per text message
   [GenAiType.textConversation]: 1,
-  // Per Audio message
   [GenAiType.liveAudioConversation]: 1,
 };
 
-export function handleChargeUser(user: User, transactionType: GenAiType) {
-  const cost = GEN_AI_COST[transactionType];
-  user.availableCredits = (user.availableCredits as number) - cost;
-  user.usedCredits = (user.usedCredits as number) + cost;
-  updateUser(user.uid, { availableCredits: user.availableCredits, usedCredits: user.usedCredits });
+// Track daily usage per user
+const dailyUsage = new Map<string, { count: number; date: string }>();
+
+function checkDailyLimit(userId: string, cost: number): boolean {
+  const today = new Date().toISOString().split('T')[0];
+  const usage = dailyUsage.get(userId);
+
+  if (!usage || usage.date !== today) {
+    dailyUsage.set(userId, { count: cost, date: today });
+    return true;
+  }
+
+  if (usage.count + cost > MAX_CREDITS_PER_DAY) {
+    return false;
+  }
+
+  usage.count += cost;
+  dailyUsage.set(userId, usage);
+  return true;
+}
+
+export async function handleChargeUser(user: User, transactionType: GenAiType): Promise<boolean> {
+  try {
+    const cost = GEN_AI_COST[transactionType];
+    const availableCredits = user.availableCredits as number;
+
+    // Check if user has enough credits
+    if (availableCredits < cost) {
+      throw new Error('Insufficient credits');
+    }
+
+    // Check daily usage limit
+    if (!checkDailyLimit(user.uid, cost)) {
+      throw new Error('Daily usage limit reached');
+    }
+
+    // Update credits
+    const newAvailableCredits = availableCredits - cost;
+    const newUsedCredits = (user.usedCredits as number) + cost;
+
+    // Update user document
+    await updateUser(user.uid, {
+      availableCredits: newAvailableCredits,
+      usedCredits: newUsedCredits,
+      lastTransactionAt: new Date().toISOString(),
+    });
+
+    // Alert if credits are running low
+    if (newAvailableCredits <= MIN_CREDITS_ALERT) {
+      console.warn(`User ${user.uid} is running low on credits: ${newAvailableCredits} remaining`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error charging user:', error);
+    return false;
+  }
 }

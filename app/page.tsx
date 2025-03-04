@@ -177,7 +177,6 @@ export default function Home() {
                 onGenerateAudio={generateAudio}
               />
               <ChatSection
-                data={data}
                 messages={messages}
                 chatMode={chatMode}
                 isLoading={chatLoading}
@@ -193,6 +192,7 @@ export default function Home() {
                   setChatMode(null);
                 }}
                 onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
+                setChatMode={setChatMode}
               />
             </>
           )}

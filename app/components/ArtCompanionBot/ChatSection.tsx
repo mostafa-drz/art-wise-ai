@@ -21,6 +21,7 @@ interface ChatSectionProps {
   onStartTextChat: () => void;
   onCloseVoiceChat: () => void;
   onToggleFloatingButton: () => void;
+  setChatMode: (mode: ChatMode | null) => void;
 }
 
 const ChatSection: React.FC<ChatSectionProps> = ({
@@ -36,6 +37,7 @@ const ChatSection: React.FC<ChatSectionProps> = ({
   onStartTextChat,
   onCloseVoiceChat,
   onToggleFloatingButton,
+  setChatMode,
 }) => {
   return (
     <>
@@ -46,6 +48,7 @@ const ChatSection: React.FC<ChatSectionProps> = ({
           onSendMessage={onSendMessage}
           inputText={chatInputText}
           onInputTextChange={onInputTextChange}
+          onClose={() => setChatMode(null)}
         />
       )}
 

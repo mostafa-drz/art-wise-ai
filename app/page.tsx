@@ -104,6 +104,34 @@ export default function Home() {
     }
   }
 
+  // Handle audio chunk for push-to-talk mode
+  const handleAudioChunk = (base64Audio: string) => {
+    liveVoiceSession.sendAudioChunk(base64Audio);
+  };
+
+  // Handle audio commit for push-to-talk mode
+  const handleCommitAudio = async () => {
+    try {
+      liveVoiceSession.commitAudioBuffer();
+      // Charge for push-to-talk message
+      handleChargeUser(user, GenAiType.textConversation);
+    } catch (error) {
+      console.error('Error processing push-to-talk:', error);
+      setError('Failed to process voice message');
+    }
+  };
+
+  // Handle live stream session end
+  const handleCloseVoiceChat = async () => {
+    try {
+      liveVoiceSession.disconnect();
+      setChatMode(null);
+    } catch (error) {
+      console.error('Error closing voice chat:', error);
+      setError('Failed to close voice chat');
+    }
+  };
+
   async function generateAudio() {
     setGenerateAudioLoading(true);
     setGenerateAudioError(null);
@@ -117,9 +145,8 @@ export default function Home() {
       }
 
       const responseData = response?.data;
-
-      handleChargeUser(user as User, GenAiType.generateAudioVersion);
-      setAudioUrl(responseData.audioUrl); // Set the audio URL returned by the server
+      handleChargeUser(user, GenAiType.generateAudioVersion);
+      setAudioUrl(responseData.audioUrl);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Something went wrong');
@@ -187,14 +214,11 @@ export default function Home() {
                 onInputTextChange={setChatInputText}
                 onOpenVoiceChat={handleOpenVoiceChat}
                 onStartTextChat={() => setChatMode(ChatMode.TEXT)}
-                onCloseVoiceChat={() => {
-                  liveVoiceSession.disconnect();
-                  setChatMode(null);
-                }}
+                onCloseVoiceChat={handleCloseVoiceChat}
                 onToggleFloatingButton={() => setIsFloatingButtonExpanded((prev) => !prev)}
                 setChatMode={setChatMode}
-                onCommitAudio={() => liveVoiceSession.commitAudioBuffer()}
-                onAudioChunk={(base64Audio: string) => liveVoiceSession.sendAudioChunk(base64Audio)}
+                onCommitAudio={handleCommitAudio}
+                onAudioChunk={handleAudioChunk}
               />
             </>
           )}

@@ -9,7 +9,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "ts:check": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "firestore:rules:deploy": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.6.0",

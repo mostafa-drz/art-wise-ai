@@ -115,8 +115,11 @@ export default function AboutPage() {
             <p className="text-blue-100 mb-6">
               Share your thoughts and help us enhance the way people connect with art worldwide.
             </p>
+            <p className="text-blue-100 mb-6">
+              <a href="mailto:hi@mostafa.xyz">hi@mostafa.xyz</a>
+            </p>
             <a
-              href="mailto:contact@artwiseai.com"
+              href="mailto:hi@mostafa.xyz"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors"
             >
               Get in Touch

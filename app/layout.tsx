@@ -4,6 +4,7 @@ import { GlobalStateProvider } from './context/GlobalState';
 import { AuthProvider } from './context/Auth';
 import Header from './components/Header';
 import Providers from './components/Providers';
+import BetaBanner from '@/components/BetaBanner';
 
 export const metadata: Metadata = {
   title: 'Art Wise AI',
@@ -37,7 +38,10 @@ export default function RootLayout({
             <Providers>
               <main className="min-h-screen w-screen">
                 <Header />
-                <div className="container mx-auto px-4 py-10">{children}</div>
+                <div className="container mx-auto px-4 py-10">
+                  <BetaBanner />
+                  {children}
+                </div>
               </main>
             </Providers>
           </GlobalStateProvider>

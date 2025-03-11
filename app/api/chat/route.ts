@@ -13,8 +13,14 @@ export async function POST(req: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
     return response;
-  } catch (error: any) {
-    return new NextResponse(JSON.stringify({ error: error?.message }), {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return new NextResponse(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    return new NextResponse(JSON.stringify({ error: 'An unknown error occurred' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

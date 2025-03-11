@@ -1,6 +1,6 @@
 import textToSpeech, { protos as ttsProtos } from '@google-cloud/text-to-speech';
 import { VertexAI, GenerateContentRequest, Content } from '@google-cloud/vertexai';
-import { VoiceGender, Input, ImagePart, Output } from '../types';
+import { VoiceGender, Input, Output } from '../types';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
@@ -9,12 +9,12 @@ const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as strin
 const vertex = new VertexAI({ project: GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION });
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
-export async function getInformationFromGemini(input: Input | undefined, imagePart: ImagePart) {
-  if (!input) {
-    throw Error('No input provided');
-  }
-  if (!imagePart) {
-    throw Error('No image provided');
+export async function getInformationFromGemini(
+  input: Input,
+  imagePart: { fileData: { fileUri: string; mimeType: string } },
+) {
+  if (!input || !imagePart) {
+    throw new Error('Input or image data is missing');
   }
 
   const model = vertex.getGenerativeModel({
@@ -23,12 +23,32 @@ export async function getInformationFromGemini(input: Input | undefined, imagePa
   });
 
   const prompt = createPrompt(input);
+
   const request: GenerateContentRequest = {
-    contents: [{ role: 'user', parts: [{ text: prompt }, imagePart] }],
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          { text: prompt },
+          {
+            fileData: {
+              fileUri: imagePart.fileData.fileUri,
+              mimeType: imagePart.fileData.mimeType,
+            },
+          },
+        ],
+      },
+    ],
   };
-  const result = await model.generateContent(request);
-  const response = result.response;
-  return response.candidates?.[0].content?.parts[0].text;
+
+  try {
+    const result = await model.generateContent(request);
+    const response = result.response;
+    return response.candidates?.[0].content?.parts[0].text;
+  } catch (error) {
+    console.error('Error communicating with Vertex AI:', error);
+    throw new Error('Failed to retrieve data from Vertex AI');
+  }
 }
 
 const createPrompt = (input: Input): string => {
@@ -50,7 +70,6 @@ interface Output {
   other_facts: string; // Any fun, social, or historical facts
   originalImageURL: string; // A URL representing the artwork image
   recommended: RecommendedArt[]; // Recommended similar artworks
-  imageBase64?: string; // Optional base64 representation of the input image
 }
 \`\`\`
 
@@ -59,13 +78,12 @@ Each recommended artwork must include:
 - \`art_title\`: Title of the artwork.
 - \`artist_name\`: Artist's name.
 - \`date\`: Year of creation.
-- \`image_url\`: Image URL (JPG/PNG preferred; return "undefined" if unavailable).
 
 ### Input:
 You receive an inline image with its MIME type and user preferences:
 \`\`\`
 {
-  "image": "base64-encoded-string",
+  "imageURL": "the image URL of uploaded art",
   "type": "image/png",
   "language": "en-US"
 }
@@ -107,7 +125,6 @@ You receive an inline image with its MIME type and user preferences:
       "image_url": "https://example.com/the-bedroom.jpg"
     }
   ],
-  "imageBase64": "base64-encoded-string"
 }
 \`\`\`
 
@@ -146,7 +163,13 @@ export const chatWithGemini = async (
   history: Content[],
   context: Output, // Artwork details
 ): Promise<{ text: string; newHistory: Content[] }> => {
-  const model = vertex.getGenerativeModel({ model: MODEL });
+  let model;
+  try {
+    model = vertex.getGenerativeModel({ model: MODEL });
+  } catch (error) {
+    console.error('Error getting generative model:', error);
+    throw new Error('Failed to get generative model');
+  }
 
   // Limit history to avoid performance overhead
   const MAX_HISTORY_LENGTH = 10;
@@ -202,6 +225,12 @@ Feel free to ask any questions about it.
 /**
  * Generates a storytelling script in SSML format using Gemini.
  */
+/**
+ * Generates a storytelling script in SSML format using Gemini.
+ *
+ * @param {Output} context - The artwork details to be included in the SSML script.
+ * @returns {Promise<string>} - The generated SSML script.
+ */
 export async function generateAudioSSML(context: Output): Promise<string> {
   const model = vertex.getGenerativeModel({ model: MODEL });
 
@@ -236,7 +265,7 @@ ${JSON.stringify(context, null, 2)}
   <break time="1s"/>
   One interesting fact is that Van Gogh painted this during the day from memory.
 </speak>
-
+    const result = await model.generateContent({ contents: [{ role: 'user', parts: [{ text: prompt }] }] });
 ### Instructions:
 Generate the entire script in valid SSML. Do not include any additional markdown or JSON format.
 `;
@@ -249,6 +278,9 @@ Generate the entire script in valid SSML. Do not include any additional markdown
       throw new Error('No SSML script generated.');
     }
 
+    if (!ssml) {
+      throw new Error('No SSML script generated.');
+    }
     return ssml.trim();
   } catch (error) {
     console.error('Error generating SSML script:', error);
@@ -258,25 +290,33 @@ Generate the entire script in valid SSML. Do not include any additional markdown
 
 /**
  * Converts the podcast script into an audio stream (base64) and returns it to the client.
+ *
+ * @param {string} ssml - The SSML script to be converted to audio.
+ * @param {string} [languageCode='en-US'] - The language code for the audio.
+ * @param {VoiceGender} [gender=VoiceGender.NEUTRAL] - The gender of the voice.
+ * @returns {Promise<string | Uint8Array<ArrayBufferLike>>} - The generated audio content.
  */
 export async function generateAudioStream(
   ssml: string,
   languageCode: string = 'en-US',
   gender: VoiceGender = VoiceGender.NEUTRAL,
-): Promise<string | Uint8Array<ArrayBufferLike>> {
+): Promise<string | Uint8Array> {
   const request = {
     input: { ssml },
     voice: { languageCode, ssmlGender: gender },
-    // google.cloud.texttospeech.v1.IAudioConfig
     audioConfig: { audioEncoding: ttsProtos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
   };
 
-  const [response] = await ttsClient.synthesizeSpeech(request);
-  // check if the response is an audio content
-  if (!response.audioContent) {
-    throw new Error('No audio content found in the response');
+  try {
+    const [response] = await ttsClient.synthesizeSpeech(request);
+    if (!response.audioContent) {
+      throw new Error('No audio content found in the response');
+    }
+    return response.audioContent;
+  } catch (error) {
+    console.error('Error generating audio stream:', error);
+    throw new Error('Failed to generate audio stream. Please try again.');
   }
-  return response.audioContent;
 }
 
 /**

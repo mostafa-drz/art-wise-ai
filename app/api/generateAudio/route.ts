@@ -36,7 +36,14 @@ export async function POST(req: NextRequest) {
 
     // Send back the public URL
     return NextResponse.json({ audioUrl: fileUrl }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error generating podcast:', error.message);
+      return new NextResponse(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     console.error('Error generating podcast:', error);
     return new NextResponse(
       JSON.stringify({ error: 'Failed to generate podcast. Please try again.' }),

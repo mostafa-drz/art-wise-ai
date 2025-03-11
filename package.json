@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run setup-google-auth && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
     "ts:check": "tsc --noEmit",
     "prepare": "husky",
     "firestore:rules:deploy": "firebase deploy --only firestore:rules",
-    "storage:rules:deploy": "firebase deploy --only storage"
+    "storage:rules:deploy": "firebase deploy --only storage",
+    "setup-google-auth": "node scripts/setupGoogleAuth.js"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.6.0",

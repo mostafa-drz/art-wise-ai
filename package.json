@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "ts:check": "tsc --noEmit",
     "prepare": "husky",
-    "firestore:rules:deploy": "firebase deploy --only firestore:rules"
+    "firestore:rules:deploy": "firebase deploy --only firestore:rules",
+    "storage:rules:deploy": "firebase deploy --only storage"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.6.0",

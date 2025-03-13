@@ -1,8 +1,6 @@
-import { getVercelOidcToken } from '@vercel/functions/oidc';
 import textToSpeech, { protos as ttsProtos } from '@google-cloud/text-to-speech';
 import { VertexAI, GenerateContentRequest, Content } from '@google-cloud/vertexai';
 import { VoiceGender, Input, Output } from '../types';
-import { BaseExternalAccountClient, ExternalAccountClient } from 'google-auth-library';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
@@ -10,65 +8,18 @@ const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const vertexClient = createVertexClient();
 const ttsClient = createTextToSpeechClient();
 
-function getGoogleAuthClient() {
-  if (process.env.NODE_ENV === 'development') {
-    throw new Error('Google Auth Client is not available in development mode');
-  }
-  const GCP_PROJECT_NUMBER = process.env.GCP_PROJECT_NUMBER;
-  const GCP_SERVICE_ACCOUNT_EMAIL = process.env.GCP_SERVICE_ACCOUNT_EMAIL;
-  const GCP_WORKLOAD_IDENTITY_POOL_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_ID;
-  const GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID;
-  const vercelOidcToken = getVercelOidcToken();
-  console.log({
-    GCP_PROJECT_NUMBER,
-    GCP_SERVICE_ACCOUNT_EMAIL,
-    GCP_WORKLOAD_IDENTITY_POOL_ID,
-    GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID,
-    vercelOidcToken,
-  });
-  const authClient = ExternalAccountClient.fromJSON({
-    type: 'external_account',
-    audience: `//iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${GCP_WORKLOAD_IDENTITY_POOL_ID}/providers/${GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID}`,
-    subject_token_type: 'urn:ietf:params:oauth:token-type:jwt',
-    token_url: 'https://sts.googleapis.com/v1/token',
-    service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT_EMAIL}:generateAccessToken`,
-    subject_token_supplier: {
-      // Use the Vercel OIDC token as the subject token
-      getSubjectToken: getVercelOidcToken,
-    },
-  }) as BaseExternalAccountClient;
-  if (!authClient) {
-    throw new Error('Failed to create Google Auth Client');
-  }
-  console.log('authClient', authClient);
-  return authClient;
-}
-
 function createVertexClient() {
   const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
   const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as string;
 
-  if (process.env.NODE_ENV === 'development') {
-    return new VertexAI({ project: GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION });
-  }
-
-  const authClient = getGoogleAuthClient();
-
   return new VertexAI({
     project: GCP_PROJECT_ID,
     location: GCP_VERTEX_MODEL_LOCATION,
-    googleAuthOptions: {
-      authClient,
-    },
   });
 }
 
 function createTextToSpeechClient() {
-  if (process.env.NODE_ENV === 'development') {
-    return new textToSpeech.TextToSpeechClient();
-  }
-  const authClient = getGoogleAuthClient();
-  return new textToSpeech.TextToSpeechClient({ authClient });
+  return new textToSpeech.TextToSpeechClient();
 }
 
 export async function getInformationFromGemini(

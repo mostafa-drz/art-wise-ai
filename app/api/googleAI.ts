@@ -29,6 +29,10 @@ function getGoogleAuthClient() {
       getSubjectToken: getVercelOidcToken,
     },
   }) as BaseExternalAccountClient;
+  if (!authClient) {
+    throw new Error('Failed to create Google Auth Client');
+  }
+  console.log('authClient', authClient);
   return authClient;
 }
 

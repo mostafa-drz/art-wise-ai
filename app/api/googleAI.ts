@@ -18,6 +18,14 @@ function getGoogleAuthClient() {
   const GCP_SERVICE_ACCOUNT_EMAIL = process.env.GCP_SERVICE_ACCOUNT_EMAIL;
   const GCP_WORKLOAD_IDENTITY_POOL_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_ID;
   const GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID;
+  const vercelOidcToken = getVercelOidcToken();
+  console.log({
+    GCP_PROJECT_NUMBER,
+    GCP_SERVICE_ACCOUNT_EMAIL,
+    GCP_WORKLOAD_IDENTITY_POOL_ID,
+    GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID,
+    vercelOidcToken,
+  });
   const authClient = ExternalAccountClient.fromJSON({
     type: 'external_account',
     audience: `//iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${GCP_WORKLOAD_IDENTITY_POOL_ID}/providers/${GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID}`,
@@ -29,6 +37,10 @@ function getGoogleAuthClient() {
       getSubjectToken: getVercelOidcToken,
     },
   }) as BaseExternalAccountClient;
+  if (!authClient) {
+    throw new Error('Failed to create Google Auth Client');
+  }
+  console.log('authClient', authClient);
   return authClient;
 }
 

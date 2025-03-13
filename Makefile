@@ -62,6 +62,12 @@ gcp-init: validate-env
 	gcloud projects add-iam-policy-binding $(PROJECT_ID) \
 		--member=serviceAccount:$(PROJECT_NUMBER)-compute@developer.gserviceaccount.com \
 		--role=roles/aiplatform.user
+	gcloud projects add-iam-policy-binding $(PROJECT_ID) \
+		--member=serviceAccount:$(PROJECT_NUMBER)-compute@developer.gserviceaccount.com \
+		--role=roles/storage.objectViewer
+	gcloud projects add-iam-policy-binding $(PROJECT_ID) \
+		--member=serviceAccount:$(PROJECT_NUMBER)-compute@developer.gserviceaccount.com \
+		--role=roles/run.invoker
 	@echo "✓ Google Cloud project initialized successfully"
 
 deploy: validate-env
@@ -73,6 +79,7 @@ deploy: validate-env
 	gcloud run deploy $(SERVICE_NAME) \
 		--source . \
 		--region $(REGION) \
+		--project $(PROJECT_ID) \
 		--allow-unauthenticated \
 		--set-env-vars="GOOGLE_CLOUD_PROJECT=$(PROJECT_ID)" \
 		$$ENV_VARS

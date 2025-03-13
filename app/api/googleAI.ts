@@ -4,23 +4,13 @@ import { VoiceGender, Input, Output } from '../types';
 
 const MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
-// Initialize clients
-const vertexClient = createVertexClient();
-const ttsClient = createTextToSpeechClient();
+// Initialize clients with default authentication
+const vertexClient = new VertexAI({
+  project: process.env.GCP_PROJECT_ID as string,
+  location: process.env.GCP_VERTEX_MODEL_LOCATION as string,
+});
 
-function createVertexClient() {
-  const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
-  const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as string;
-
-  return new VertexAI({
-    project: GCP_PROJECT_ID,
-    location: GCP_VERTEX_MODEL_LOCATION,
-  });
-}
-
-function createTextToSpeechClient() {
-  return new textToSpeech.TextToSpeechClient();
-}
+const ttsClient = new textToSpeech.TextToSpeechClient();
 
 export async function getInformationFromGemini(
   input: Input,

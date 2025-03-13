@@ -164,3 +164,52 @@ The application uses Sentry for error tracking and monitoring. All errors are au
 ## License
 
 This project is provided for **learning purposes only** and is intended to demonstrate the capabilities of Generative AI and real-time communication technologies.
+
+## Deployment
+
+### Google Cloud Deployment
+
+This project can be deployed to Google Cloud Run. Follow these steps:
+
+1. **Prerequisites**
+
+   - Install [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
+   - Install [Node.js](https://nodejs.org/) (version 20 or greater)
+
+2. **Environment Setup**
+
+   ```bash
+   # Copy environment file
+   cp .env.example .env
+
+   # Fill in the required values in .env:
+   # - GCP_PROJECT_ID
+   # - GCP_VERTEX_MODEL_LOCATION
+   # - GEMINI_MODEL
+   ```
+
+3. **Google Cloud Setup**
+
+   ```bash
+   # Initialize Google Cloud configuration
+   make gcp-init
+   ```
+
+4. **Deploy**
+
+   ```bash
+   # Deploy to Cloud Run
+   make deploy
+   ```
+
+5. **Cleanup (Optional)**
+   ```bash
+   # Remove deployed resources
+   make clean
+   ```
+
+For more information about available commands:
+
+```bash
+make help
+```

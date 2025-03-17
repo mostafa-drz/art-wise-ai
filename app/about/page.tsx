@@ -109,6 +109,43 @@ export default function AboutPage() {
             </div>
           </section>
 
+          {/* Learning & Open Source Section */}
+          <section className="bg-white rounded-2xl shadow-sm p-8 mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Learn AI Development</h2>
+            <div className="prose prose-blue">
+              <p className="text-gray-600 leading-relaxed">
+                This project serves as an educational resource for developers interested in:
+              </p>
+              <ul className="list-disc pl-6 text-gray-600">
+                <li>Building AI-powered applications with Next.js and Google Cloud</li>
+                <li>Implementing real-time voice interactions using WebRTC</li>
+                <li>Working with modern authentication and database systems</li>
+                <li>Creating accessible and responsive user interfaces</li>
+              </ul>
+              <div className="mt-6">
+                <a
+                  href="https://github.com/mostafa-drz/art-wise-ai"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  Explore the Code on GitHub
+                  <svg
+                    className="ml-2 w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </section>
+
           {/* Contact Section */}
           <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-sm p-8 text-white">
             <h2 className="text-2xl font-bold mb-4">Be Part of Art&apos;s Future</h2>

@@ -35,7 +35,7 @@ export default function BetaBanner() {
       </div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <p className="text-sm leading-6 text-white">
-          <strong className="font-semibold">Beta Release</strong>
+          <strong className="font-semibold">Open Source Project</strong>
           <svg
             viewBox="0 0 2 2"
             className="mx-2 inline h-0.5 w-0.5 fill-current"
@@ -43,13 +43,15 @@ export default function BetaBanner() {
           >
             <circle cx={1} cy={1} r={1} />
           </svg>
-          This project is in active development. Feel free to explore and provide feedback!
+          This is a free and open source project. Check out the code on GitHub!
         </p>
         <Link
-          href="/about"
-          className="flex items-center gap-x-1 rounded-full bg-white/10 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-white/20 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          href="https://github.com/mostafa-drz/art-wise-ai"
+          className="flex items-center gap-x-1 rounded-full bg-white/10 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-white/20 transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          Learn more <ArrowRight className="h-4 w-4" />
+          View Source <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
       <div className="flex flex-1 justify-end">

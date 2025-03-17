@@ -114,7 +114,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem('emailForSignIn', email);
-      alert('A sign-in link has been sent to your email.');
     } catch (error: unknown) {
       console.error('Error sending sign-in email:', error);
       throw new Error(error instanceof Error ? error.message : 'An unknown error occurred');
@@ -128,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
-        throw new Error('No email found. Please re-enter your email address.');
+        return;
       }
 
       if (isSignInWithEmailLink(auth, window.location.href)) {

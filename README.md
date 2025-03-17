@@ -68,6 +68,33 @@ Built with **Next.js**, **Google Cloud Vertex AI (Gemini)**, **Firebase**, and *
 
 ---
 
+## Educational Purpose
+
+This project serves as a learning resource for developers interested in AI integration and modern web development. Key learning aspects include:
+
+### Learning Objectives
+
+- Building AI-powered applications with Next.js and Google Cloud
+- Implementing real-time voice interactions with WebRTC
+- Working with modern authentication and database systems
+- Creating accessible and responsive user interfaces
+
+### Live Demo
+
+Experience the application at [art-wise-ai.mostafa.xyz](https://art-wise-ai.mostafa.xyz)
+
+### Contributing
+
+This is an educational project and contributions are welcome! Whether you're fixing bugs, improving documentation, or adding new features, please feel free to:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
 ## Installation
 
 1. **Clone the repository**

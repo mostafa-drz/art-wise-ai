@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
-        throw new Error('No email found. Please re-enter your email address.');
+        return;
       }
 
       if (isSignInWithEmailLink(auth, window.location.href)) {

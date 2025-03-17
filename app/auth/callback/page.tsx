@@ -5,7 +5,7 @@ import { useAuth } from '../../context/Auth';
 import { useRouter } from 'next/navigation';
 
 export default function AuthCallbackPage() {
-  const { handleSignInWithEmailLink } = useAuth();
+  const { handleSignInWithEmailLink, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -18,9 +18,10 @@ export default function AuthCallbackPage() {
         alert('Failed to sign in. Please try again.');
       }
     };
-
-    completeSignIn();
-  }, [handleSignInWithEmailLink, router]);
+    if (!loading) {
+      completeSignIn();
+    }
+  }, [handleSignInWithEmailLink, router, loading]);
 
   return (
     <div className="container mx-auto px-5 py-10">

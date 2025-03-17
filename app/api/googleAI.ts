@@ -11,21 +11,10 @@ const vertexClient = createVertexClient();
 const ttsClient = createTextToSpeechClient();
 
 function getGoogleAuthClient() {
-  if (process.env.NODE_ENV === 'development') {
-    throw new Error('Google Auth Client is not available in development mode');
-  }
-  console.log('Getting Google Auth Client...');
   const GCP_PROJECT_NUMBER = process.env.GCP_PROJECT_NUMBER;
   const GCP_SERVICE_ACCOUNT_EMAIL = process.env.GCP_SERVICE_ACCOUNT_EMAIL;
   const GCP_WORKLOAD_IDENTITY_POOL_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_ID;
   const GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID;
-  console.log('GCP Account Details:', {
-    GCP_PROJECT_NUMBER,
-    GCP_SERVICE_ACCOUNT_EMAIL,
-    GCP_WORKLOAD_IDENTITY_POOL_ID,
-    GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID,
-  });
-  console.log('Creating ExternalAccountClient...');
   const authClient = ExternalAccountClient.fromJSON({
     type: 'external_account',
     audience: `//iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${GCP_WORKLOAD_IDENTITY_POOL_ID}/providers/${GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID}`,
@@ -37,17 +26,12 @@ function getGoogleAuthClient() {
       getSubjectToken: getVercelOidcToken,
     },
   }) as BaseExternalAccountClient;
-  console.log('ExternalAccountClient created successfully', authClient);
   return authClient;
 }
 
 function createVertexClient() {
   const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID as string;
   const GCP_VERTEX_MODEL_LOCATION = process.env.GCP_VERTEX_MODEL_LOCATION as string;
-
-  if (process.env.NODE_ENV === 'development') {
-    return new VertexAI({ project: GCP_PROJECT_ID, location: GCP_VERTEX_MODEL_LOCATION });
-  }
 
   const authClient = getGoogleAuthClient();
 
@@ -61,9 +45,6 @@ function createVertexClient() {
 }
 
 function createTextToSpeechClient() {
-  if (process.env.NODE_ENV === 'development') {
-    return new textToSpeech.TextToSpeechClient();
-  }
   const authClient = getGoogleAuthClient();
   return new textToSpeech.TextToSpeechClient({ authClient });
 }

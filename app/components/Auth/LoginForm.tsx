@@ -93,11 +93,15 @@ export default function LoginForm() {
 
       {/* Right Column - Login Form & Video */}
       <div className="space-y-8">
-        {/* Video Placeholder */}
+        {/* Video Embed */}
         <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden">
-          <div className="flex items-center justify-center h-full">
-            <span className="text-gray-500">Demo video coming soon</span>
-          </div>
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/zNVE2IIE3a0?autoplay=1&mute=1&loop=1&playlist=zNVE2IIE3a0&controls=0&rel=0"
+            title="Art Wise AI Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
 
         {/* Login Form */}

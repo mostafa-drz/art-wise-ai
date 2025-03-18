@@ -1,9 +1,15 @@
 # Art Wise AI
 
 Your personal AI-powered art companion – explore the story behind artworks effortlessly.
-[Demo](https://youtube.com/shorts/C7zNHCYIfvc)
-[![Demo Preview 1](/public/assets/screenshot-1.png)](https://youtube.com/shorts/C7zNHCYIfvc)
-[![Demo Preview 2](/public/assets/screenshot-2.png)](https://youtube.com/shorts/C7zNHCYIfvc)
+
+[![Watch Demo](https://img.youtube.com/vi/zNVE2IIE3a0/maxresdefault.jpg)](https://youtu.be/zNVE2IIE3a0)
+
+## Screenshots
+
+![Main Interface](/public/assets/screenshot-1.png)
+![Art Analysis](/public/assets/screenshot-2.png)
+![Interactive Chat](/public/assets/screenshots-3.png)
+![Live Voice Chat](/public/assets/screenshots-4.png)
 
 ## Description
 
